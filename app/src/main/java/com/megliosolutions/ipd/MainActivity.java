@@ -9,5 +9,26 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+        // This method initializes stuff needed for the views
+        InitializeStuff();
+
+        // This method runs the loading pop up alert dialog
+        LoadProgress();
+
+        PopulateList();
+    }
+
+    private void InitializeStuff() {
+
+    }
+
+    private void LoadProgress() {
+
+    }
+
+    private void PopulateList() {
+
     }
 }
