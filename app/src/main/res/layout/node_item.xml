@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="10dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="IP ADDRESS"
+        android:id="@+id/node_item_IP"
+        android:layout_margin="@dimen/node_item_margin"
+        android:textSize="@dimen/node_item_text_size"
+        android:textColor="@color/textColor"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="LAT"
+        android:id="@+id/node_item_LAT"
+        android:layout_toRightOf="@+id/node_item_IP"
+        android:layout_toEndOf="@+id/node_item_IP"
+        android:textSize="@dimen/node_item_text_size"
+        android:textColor="@color/textColor"
+        android:layout_marginLeft="@dimen/node_item_margin"
+        android:layout_marginRight="@dimen/node_item_margin"
+        android:layout_marginTop="@dimen/node_item_margin"
+        android:layout_alignBottom="@+id/node_item_IP" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="LONG"
+        android:id="@+id/node_item_LONG"
+        android:textSize="@dimen/node_item_text_size"
+        android:textColor="@color/textColor"
+        android:layout_marginLeft="@dimen/node_item_margin"
+        android:layout_alignTop="@+id/Node_Slash"
+        android:layout_toRightOf="@+id/Node_Slash"
+        android:layout_toEndOf="@+id/Node_Slash" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="/"
+        android:id="@+id/Node_Slash"
+        android:textSize="@dimen/node_item_text_size"
+        android:textColor="@color/textColor"
+        android:layout_alignTop="@+id/node_item_LAT"
+        android:layout_toRightOf="@+id/node_item_LAT"
+        android:layout_toEndOf="@+id/node_item_LAT"
+        android:textStyle="bold" />
+</RelativeLayout>

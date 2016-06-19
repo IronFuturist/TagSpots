@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "155492185923",
+    "firebase_url": "https://project-7128334877446372170.firebaseio.com/",
+    "project_id": "project-7128334877446372170",
+    "storage_bucket": "project-7128334877446372170.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:155492185923:android:38f2533b561e2a39",
+        "android_client_info": {
+          "package_name": "com.megliosolutions.ipd"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "155492185923-3t62gukgfk266ncqbnsee5k6ol4vltce.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAH_a1xxbw96lWrT0uRg4algv4LnAtAyyY"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

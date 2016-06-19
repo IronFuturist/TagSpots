@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".MainActivity">
+
+
+    <item
+        android:id="@+id/getGPS"
+        android:icon="@drawable/ic_get_gps"
+        app:showAsAction="ifRoom|withText"
+        android:title="@string/getgps">
+    </item>
+    <item
+        android:id="@+id/addNode"
+        android:icon="@drawable/ic_add_node"
+        app:showAsAction="ifRoom|withText"
+        android:title="@string/addnode">
+    </item>
+    <item
+        android:id="@+id/logout"
+        android:icon="@drawable/ic_eject_white_48dp"
+        app:showAsAction="ifRoom|withText"
+        android:title="@string/sign_out">
+    </item>
+
+</menu>
