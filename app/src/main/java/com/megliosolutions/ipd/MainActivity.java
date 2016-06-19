@@ -121,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
 
                 //Delete node
                 listAdapter.mNodes.remove(position);
-                mDatabase.child("nodes").push().getRef().removeValue();
+                mDatabase.child("nodes").removeValue();
                 listAdapter.setNotifyOnChange(true);
                 Toast.makeText(getApplicationContext(),"Removed Item at: " + position,Toast.LENGTH_SHORT).show();
                 main_ListView.setAdapter(listAdapter);
