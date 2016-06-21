@@ -96,19 +96,13 @@ public class Login extends BaseActivity {
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 user = firebaseAuth.getCurrentUser();
                 if (user != null) {
-
                     // User is signed in
                     Log.d(TAG, "onAuthStateChanged: USER:" + user.getUid());
-
                     mDatabase.child("users").child(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
-                            if(dataSnapshot.exists()){
-                                Intent intent = new Intent(Login.this,MainActivity.class);
-                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                startActivity(intent);
-                            }else{
+                            if(!dataSnapshot.exists()){
+                                Log.i(TAG, "AuthStateListener-DataExists-IF: " + dataSnapshot.exists());
                                 mEmail = mEmailField.getText().toString();
                                 mPassword = mPasswordField.getText().toString();
                                 mUsername = "";
@@ -120,50 +114,42 @@ public class Login extends BaseActivity {
                                 uo.setPassword(mPassword);
                                 //Add user to database for authentication access
                                 mDatabase.child("users").child(user.getUid()).setValue(uo);
+
+                                Toast.makeText(Login.this, "Logging in...",
+                                        Toast.LENGTH_SHORT).show();
+
                                 Intent intent = new Intent(Login.this,MainActivity.class);
                                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                 startActivity(intent);
+                                // [END sign_in_with_email]
+                                // [START_EXCLUDE]
+                                hideProgressDialog();
+                                // [END_EXCLUDE]
+                            }else{
+                                Log.i(TAG, "AuthStateListener-DataExists-ELSE: " + dataSnapshot.exists());
+                                Toast.makeText(Login.this, "Logging in...",
+                                        Toast.LENGTH_SHORT).show();
+
+                                Intent intent = new Intent(Login.this,MainActivity.class);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                startActivity(intent);
+                                // [END sign_in_with_email]
+                                // [START_EXCLUDE]
+                                hideProgressDialog();
+                                // [END_EXCLUDE]
                             }
-
-
                         }
-
                         @Override
                         public void onCancelled(DatabaseError databaseError) {
-
+                            Log.d(TAG, "onAuthStateChanged-DatabaseError: " + databaseError.getMessage());
                         }
                     });
-
-
-                    /*if (mDatabase.child("users").getKey().equalsIgnoreCase(user.getUid())) {
-                        // User is signed in
-                        Log.d(TAG, "USER SIGNED IN, GOOD JOB. WANT A COOKIE?");
-                    } else {
-                        mEmail = mEmailField.getText().toString();
-                        mPassword = mPasswordField.getText().toString();
-                        mUsername = "";
-
-                        //Make User Object
-                        UserObject uo = new UserObject(mEmail,mUsername,mPassword);
-                        uo.setEmail(mEmail);
-                        uo.setUsername(mUsername);
-                        uo.setPassword(mPassword);
-                        //Add user to database for authentication access
-                        mDatabase.child("users").child(user.getUid()).setValue(uo);
-                        Intent intent = new Intent(Login.this,MainActivity.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        startActivity(intent);
-                    }*/
-                    //End of Add user to database
-
                 } else {
                     // User is signed out
                     Log.d(TAG, "onAuthStateChanged:signed_out");
                 }
-
-
             }
         };
         // [END auth_state_listener]
@@ -214,10 +200,7 @@ public class Login extends BaseActivity {
 
                     }
                 });
-        // [END sign_in_with_email]
-        // [START_EXCLUDE]
-        hideProgressDialog();
-        // [END_EXCLUDE]
+
     }
 
     private boolean validateForm() {

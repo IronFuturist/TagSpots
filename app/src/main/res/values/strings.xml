@@ -59,4 +59,6 @@
     <string name="email_fmt">Email: %s</string>
     <string name="node_staticIP">Enter Static IP…</string>
     <string name="main_add_username">Type something dude…</string>
+    <string name="enter_latitude">Enter Latitude</string>
+    <string name="enter_longitude">Enter Longitude</string>
 </resources>
