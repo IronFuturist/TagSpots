@@ -5,12 +5,12 @@
     tools:context=".MainActivity">
 
 
-    <!--<item
-        android:id="@+id/getGPS"
-        android:icon="@drawable/ic_get_gps"
+    <item
+        android:id="@+id/refresh"
+        android:icon="@drawable/ic_refresh_white_48dp"
         app:showAsAction="ifRoom|withText"
-        android:title="@string/getgps">
-    </item>-->
+        android:title="@string/refresh">
+    </item>
     <item
         android:id="@+id/addNode"
         android:icon="@drawable/ic_add_node"

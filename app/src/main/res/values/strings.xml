@@ -61,4 +61,7 @@
     <string name="main_add_username">Type something dude…</string>
     <string name="enter_latitude">Enter Latitude</string>
     <string name="enter_longitude">Enter Longitude</string>
+    <string name="enter_description">Enter Description</string>
+    <string name="refresh">refresh</string>
+
 </resources>

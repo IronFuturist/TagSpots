@@ -45,11 +45,14 @@ public class MainActivity extends AppCompatActivity {
     public FirebaseAuth mAuth;
     public FirebaseUser mUser;
     public DatabaseReference mDatabase;
+    public DatabaseReference mNodeRef;
 
     //Strings
     public String static_ip;
+    public String desc;
     public String lat;
     public String mLong;
+    public String mKey;
     public String currentUser;
     public String getUsername;
     public String setUsername;
@@ -65,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
     //List of NodeObjects
     //Give default value
     public List<NodeObject> nodesList = new ArrayList<>();
+    public String keys;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,25 +76,134 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         //Instances
-        mAuth = FirebaseAuth.getInstance();
-        mUser = mAuth.getCurrentUser();
-        mDatabase = FirebaseDatabase.getInstance().getReference();
-        currentUser = mUser.getUid();
+        setInstances();
 
+        //Check username & set it
         checkUsername();
 
         //Initialize View From XML
-        main_ListView = (ListView)findViewById(R.id.Main_listview);
+        InitializeStuff();
 
         //Toolbar
+        setToolbar();
+        //[End of Toolbar]
+
+        //Generate key for nodes
+        GenerateKey();
+
+        //Set Adapter
+        SetAdapter();
+        //Set ClickListeners
+        setClickListeners();
+
+        //Logstuff
+        logDataFromVariables();
+
+
+    }
+
+    private void GenerateKey() {
+        mKey = mNodeRef.push().getKey();
+        Log.i(TAG, "NODE CHILD KEY: " + mKey);
+        if(mKey.equalsIgnoreCase(mKey)){
+            mKey = mNodeRef.push().getKey();
+            Log.i(TAG, "NEW NODE CHILD KEY: " + mKey);
+        }
+    }
+
+    private void logDataFromVariables() {
+        //Log some stuff
+        Log.i(TAG, "USER: " + currentUser);
+        //Log Keys
+        Log.i(TAG, "WHERE ARE THE KEYS BITCHES: " + keys);
+
+    }
+
+    private void setInstances() {
+        mAuth = FirebaseAuth.getInstance();
+        mUser = mAuth.getCurrentUser();
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        mNodeRef = mDatabase.child("nodes");
+        currentUser = mUser.getUid();
+    }
+
+    private void setClickListeners() {
+        //Set OnItemClick Listener
+        //When clicked, it will go to a single view of the node
+        //populating it's data
+        main_ListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                //Go to NodeView
+                NodeObject pos = listAdapter.mNodes.get(position);
+                Intent intent = new Intent(MainActivity.this, NodeView.class);
+                intent.putExtra("staticIP",pos.getStaticAddress());
+                intent.putExtra("description",pos.getDescription());
+                intent.putExtra("lat",pos.getLatitude());
+                intent.putExtra("long",pos.getLongitude());
+                startActivity(intent);
+                //Bring Data with
+            }
+        });
+
+        //Set OnItemLong Click Listener
+        //Delete Node when long pressed
+        //Show dialog to give user a choice
+        main_ListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
+
+                final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MainActivity.this);
+                dialogBuilder.setTitle("Please Don't Kill Me!");
+                dialogBuilder.setPositiveButton("Kill Me...", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //Delete node
+                        Log.d(TAG, "NUM of NODES: " + listAdapter.mNodes.size());
+                        NodeObject pos = listAdapter.mNodes.get(position);
+                        Log.i(TAG, "Generated Key: " + mKey);
+                        String selectedKey = listAdapter.mNodes.get(position).getKey();
+                        Log.i(TAG, "Selected Key: " + selectedKey);
+                        mNodeRef.child(selectedKey).removeValue();
+                        listAdapter.mNodes.remove(pos);
+                        listAdapter.notifyDataSetChanged();
+                        main_ListView.setAdapter(listAdapter);
+                        Toast.makeText(getApplicationContext(), "Node has been murdered terribly."
+                                , Toast.LENGTH_SHORT).show();
+                    }
+                }).
+                        setNegativeButton("Don't Kill Me!", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Toast.makeText(getApplicationContext(), "Fine, ya coward."
+                                        , Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
+                dialogBuilder.create().show();
+                /*
+                Toast.makeText(getApplicationContext(),"Item at: " + position,Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), ""  +listAdapter.mNodes.size(), Toast.LENGTH_SHORT).show();*/
+
+
+                return true;
+            }
+        });
+    }
+
+    private void InitializeStuff() {
+        main_ListView = (ListView)findViewById(R.id.Main_listview);
+    }
+
+    private void setToolbar() {
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        //[End of Toolbar]
+    }
 
-
+    private void SetAdapter() {
         //ListAdapter stuff
         listAdapter = new StaticListAdapter(getApplicationContext(),nodesList);
 
@@ -101,44 +214,6 @@ public class MainActivity extends AppCompatActivity {
 
             main_ListView.setAdapter(listAdapter);
         }
-
-        //SetTitle to Username
-
-
-        //Set OnItemClick Listener
-        //When clicked, it will go to a single view of the node
-        //populating it's data
-        main_ListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //Go to NodeView
-
-                //Bring Data with
-            }
-        });
-
-        //Set OnItemLong Click Listener
-        //Delete Node when long pressed
-        //Show dialog to give user a choice
-        main_ListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-
-                //Delete node
-                Log.d(TAG, "NUM of NODES: " + listAdapter.mNodes.size());
-                listAdapter.mNodes.remove(position);
-                mDatabase.child("nodes").removeValue();
-                listAdapter.setNotifyOnChange(true);
-                Toast.makeText(getApplicationContext(),"Item at: " + position,Toast.LENGTH_SHORT).show();
-                Toast.makeText(getApplicationContext(), ""  +listAdapter.mNodes.size(), Toast.LENGTH_SHORT).show();
-                main_ListView.setAdapter(listAdapter);
-                return true;
-            }
-        });
-
-        //Log some stuff
-        Log.i(TAG, "USER: " + currentUser);
-
     }
 
     private void checkUsername() {
@@ -146,10 +221,9 @@ public class MainActivity extends AppCompatActivity {
         mDatabase.child("users").child(mUser.getUid()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Log.i(TAG, "USER INFO: " + dataSnapshot.getKey());
+                Log.i(TAG, "USER KEY : " + dataSnapshot.getKey());
                 Log.i(TAG, "USER INFO: " + dataSnapshot.child("username").getValue());
                 getUsername = (String) dataSnapshot.child("username").getValue();
-                Log.i(TAG, "USER - USERNAME STRING: " + getUsername);
                 setUserTitle();
             }
 
@@ -206,21 +280,24 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(TAG, "onChildAdded:" + dataSnapshot.getKey());
                 NodeObject nodeObject = dataSnapshot.getValue(NodeObject.class);
 
-                s = dataSnapshot.getKey();
 
-                Log.i(TAG, "NODE String: " + s);
+                keys = dataSnapshot.getKey();
 
-
+                Log.i(TAG, "HERE ARE THE KEYS BITCHES: " + keys);
 
 
                 listAdapter.add(nodeObject);
+                listAdapter.notifyDataSetChanged();
                 listAdapter.setNotifyOnChange(true);
+
+                Log.i(TAG, "Node Strings: " + listAdapter.mNodes.get(0).getKey());
             }
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                 Log.d(TAG, "onChildChanged:" + dataSnapshot.getKey());
 
+                listAdapter.notifyDataSetChanged();
                 listAdapter.setNotifyOnChange(true);
             }
 
@@ -255,9 +332,13 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         switch (item.getItemId()) {
-           /* case R.id.getGPS:
+            case R.id.refresh:
                //nothing
-                return true;*/
+                listAdapter.mNodes.clear();
+                retrieveMoreData();
+                Toast.makeText(getApplicationContext(), "Refreshed."
+                        , Toast.LENGTH_SHORT).show();
+                return true;
             case R.id.addNode:
                 addNode();
                 return true;
@@ -281,6 +362,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void addNode() {
+        //Get generated key set it to the node
+        GenerateKey();
+        Log.i(TAG, "ADD NODE GENERATED KEY: " + mKey);
+
         //AlertDialog
         final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
 
@@ -298,17 +383,22 @@ public class MainActivity extends AppCompatActivity {
                 dialogView.findViewById(R.id.lat_et);
         final EditText editText2 = (EditText)
                 dialogView.findViewById(R.id.long_et);
+        final EditText editText3 = (EditText)
+                dialogView.findViewById(R.id.desc_et);
         dialogBuilder.setPositiveButton("Assign", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 static_ip = editText.getText().toString();
+                desc = editText3.getText().toString();
                 lat = editText1.getText().toString();
                 mLong = editText2.getText().toString();
-                node = new NodeObject(static_ip, lat, mLong);
-                mDatabase.child("nodes").push().setValue(node);
-                Toast.makeText(getApplicationContext(), "Node: \n" + "StaticIP:  " + static_ip + "\n" +
-                                                                     "Latitude:  " + lat + "\n" +
-                                                                     "Longitude: " + mLong
+                node = new NodeObject(static_ip,desc,lat,mLong,mKey);
+                mDatabase.child("nodes").child(mKey).setValue(node);
+                Toast.makeText(getApplicationContext(), "Node: \n" + "Child Key:   " + mKey + "\n" +
+                                                                     "StaticIP:    " + static_ip + "\n" +
+                                                                     "Latitude:    " + lat + "\n" +
+                                                                     "Description: " + desc + "\n" +
+                                                                     "Longitude:   " + mLong
                         , Toast.LENGTH_SHORT).show();
             }
         }).
@@ -334,4 +424,5 @@ public class MainActivity extends AppCompatActivity {
         listAdapter.notifyDataSetChanged();
         main_ListView.setAdapter(listAdapter);
     }
+
 }

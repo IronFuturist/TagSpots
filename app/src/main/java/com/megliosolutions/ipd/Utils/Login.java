@@ -115,9 +115,6 @@ public class Login extends BaseActivity {
                                 //Add user to database for authentication access
                                 mDatabase.child("users").child(user.getUid()).setValue(uo);
 
-                                Toast.makeText(Login.this, "Logging in...",
-                                        Toast.LENGTH_SHORT).show();
-
                                 Intent intent = new Intent(Login.this,MainActivity.class);
                                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -127,7 +124,7 @@ public class Login extends BaseActivity {
                                 hideProgressDialog();
                                 // [END_EXCLUDE]
                             }else{
-                                Log.i(TAG, "AuthStateListener-DataExists-ELSE: " + dataSnapshot.exists());
+                                Log.i(TAG, "AuthStateListener-DataExists-ELSE: " + !dataSnapshot.exists());
                                 Toast.makeText(Login.this, "Logging in...",
                                         Toast.LENGTH_SHORT).show();
 

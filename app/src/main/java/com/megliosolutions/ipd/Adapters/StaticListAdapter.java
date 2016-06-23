@@ -24,8 +24,7 @@ public class StaticListAdapter extends ArrayAdapter<NodeObject> {
 
     public class ViewHolder {
         TextView mStaticAddress;
-        TextView mLAT;
-        TextView mLONG;
+        TextView mDescription;
 
     }
 
@@ -45,16 +44,14 @@ public class StaticListAdapter extends ArrayAdapter<NodeObject> {
         NodeObject node = mNodes.get(position);
         if (convertView == null) {
             convertView = LayoutInflater.from(this.mContext).inflate(R.layout.node_item, null);
-            holder.mLONG = (TextView) convertView.findViewById(R.id.node_item_LONG);
             holder.mStaticAddress = (TextView) convertView.findViewById(R.id.node_item_IP);
-            holder.mLAT = (TextView) convertView.findViewById(R.id.node_item_LAT);
+            holder.mDescription = (TextView) convertView.findViewById(R.id.node_item_desc);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
         holder.mStaticAddress.setText(node.getStaticAddress());
-        holder.mLONG.setText(node.getLongitude());
-        holder.mLAT.setText(node.getLatitude());
+        holder.mDescription.setText(node.getDescription());
 
         return convertView;
     }
