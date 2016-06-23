@@ -303,8 +303,23 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
+                String removedKey = dataSnapshot.getKey();
                 Log.d(TAG, "onChildRemoved:" + dataSnapshot.getKey());
 
+                //For Loop to cycle through listview adapter array to get the right key
+                //Then get that position, and remove it from the list.
+                String removeNode;
+                String getKey;
+                for(int i=0; i<listAdapter.getCount();i++){
+                    NodeObject nodeItem = listAdapter.getItem(i);
+                    removeNode = nodeItem.getKey();
+                    Log.i(TAG, "NODE TO REMOVE: " + removeNode);
+                }
+
+                //listAdapter.mNodes.remove();
+                listAdapter.notifyDataSetChanged();
+                listAdapter.setNotifyOnChange(true);
+                main_ListView.setAdapter(listAdapter);
             }
 
             @Override
@@ -418,9 +433,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         listAdapter.clear();
-        //retrieveData();
         retrieveMoreData();
-        Log.i(TAG, listAdapter.mNodes.size() +"");
+        Log.i(TAG, "Node Size: " + listAdapter.mNodes.size() +"");
         listAdapter.notifyDataSetChanged();
         main_ListView.setAdapter(listAdapter);
     }

@@ -33,12 +33,14 @@ public class NodeView extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-
         //Initialize Data
         InitializeData();
 
         //Gather data from itemclick
         gatherData();
+
+        //ChangeTitle
+        UpdateTitle();
 
         //Populate Data
         populateData();
@@ -52,6 +54,13 @@ public class NodeView extends AppCompatActivity {
                 startActivity(mapIntent);
             }
         });
+
+    }
+
+    private void UpdateTitle() {
+
+        //Set Title to Description
+        setTitle(description);
 
     }
 
