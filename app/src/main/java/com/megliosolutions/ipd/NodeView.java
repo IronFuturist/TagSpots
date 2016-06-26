@@ -118,6 +118,8 @@ public class NodeView extends AppCompatActivity implements OnMapReadyCallback {
                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_wifi_black_48dp))
                 .anchor(0.0f, 1.0f) // Anchors the marker on the bottom left
                 .position(new LatLng(41.889, -87.622)));
+
+        //Change
     }
 }
 
