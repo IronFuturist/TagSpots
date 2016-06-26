@@ -411,8 +411,8 @@ public class MainActivity extends AppCompatActivity {
                 mDatabase.child("nodes").child(mKey).setValue(node);
                 Toast.makeText(getApplicationContext(), "Node: \n" + "Child Key:   " + mKey + "\n" +
                                                                      "StaticIP:    " + static_ip + "\n" +
-                                                                     "Latitude:    " + lat + "\n" +
                                                                      "Description: " + desc + "\n" +
+                                                                     "Latitude:    " + lat + "\n" +
                                                                      "Longitude:   " + mLong
                         , Toast.LENGTH_SHORT).show();
             }

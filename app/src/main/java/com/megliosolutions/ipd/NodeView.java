@@ -15,8 +15,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -43,11 +43,11 @@ public class NodeView extends AppCompatActivity implements OnMapReadyCallback {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        //SetMap
+        SetMap();
+
         //Initialize Data
         InitializeData();
-
-        //Map Fragment
-        ShowMapFragment();
 
         //Gather data from itemclick
         gatherData();
@@ -70,11 +70,9 @@ public class NodeView extends AppCompatActivity implements OnMapReadyCallback {
 
     }
 
-    private void ShowMapFragment() {
-        FragmentManager fmanager = getSupportFragmentManager();
-        Fragment fragment = fmanager.findFragmentById(R.id.node_maps);
-        SupportMapFragment supportmapfragment = (SupportMapFragment)fragment;
-        GoogleMap supportMap = supportmapfragment.getMap();
+    private void SetMap() {
+        MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.node_maps);
+        mapFragment.getMapAsync(this);
     }
 
     private void UpdateTitle() {
@@ -108,18 +106,23 @@ public class NodeView extends AppCompatActivity implements OnMapReadyCallback {
     }
 
     @Override
-    public void onMapReady(GoogleMap googleMap) {
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                new LatLng(41.889, -87.622), 16));
+    public void onMapReady(GoogleMap map) {
+        map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
-        // You can customize the marker image using images bundled with
-        // your app, or dynamically generated bitmaps.
-        googleMap.addMarker(new MarkerOptions()
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_wifi_black_48dp))
-                .anchor(0.0f, 1.0f) // Anchors the marker on the bottom left
-                .position(new LatLng(41.889, -87.622)));
+        CameraPosition googlePlex = CameraPosition.builder()
+                .target(new LatLng(30.410798,-86.781495))
+                .zoom(16)
+                .bearing(0)
+                .tilt(45)
+                .build();
 
-        //Change
+        map.animateCamera(CameraUpdateFactory.newCameraPosition(googlePlex), 10000, null);
+
+        map.addMarker(new MarkerOptions()
+                .position(new LatLng(30.410798, -86.781495))
+                .title("Cody's House"))
+                .setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_wifi_black_48dp));
+
     }
 }
 

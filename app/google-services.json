@@ -1,7 +1,7 @@
 {
   "project_info": {
     "project_number": "155492185923",
-    "firebase_url": "https://project-7128334877446372170.firebaseio.com/",
+    "firebase_url": "https://project-7128334877446372170.firebaseio.com",
     "project_id": "project-7128334877446372170",
     "storage_bucket": "project-7128334877446372170.appspot.com"
   },
@@ -13,17 +13,8 @@
           "package_name": "com.megliosolutions.ipd"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "155492185923-3t62gukgfk266ncqbnsee5k6ol4vltce.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyAH_a1xxbw96lWrT0uRg4algv4LnAtAyyY"
-        }
-      ],
+      "oauth_client": [],
+      "api_key": [{ "current_key": "AIzaSyDDTDeFKQmfZfznM1pwOnNaRP32CWMCwo0" }],
       "services": {
         "analytics_service": {
           "status": 1

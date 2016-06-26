@@ -192,6 +192,10 @@ public class Login extends BaseActivity {
                             Log.w(TAG, "signInWithEmail", task.getException());
                             Toast.makeText(Login.this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
+                            Log.w(TAG, "ISSUE LOOK HERE!!!!!! ---> " + mAuth.getCurrentUser());
+                            // [START_EXCLUDE]
+                            hideProgressDialog();
+                            // [END_EXCLUDE]
                         }
 
 
