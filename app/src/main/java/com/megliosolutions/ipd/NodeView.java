@@ -3,18 +3,28 @@ package com.megliosolutions.ipd;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-public class NodeView extends AppCompatActivity {
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+
+public class NodeView extends AppCompatActivity implements OnMapReadyCallback {
 
     public TextView staticAddress_TV;
     public TextView description_TV;
     public TextView latitude_TV;
-    public TextView longitude_TV;
 
     public Button maps_Button;
 
@@ -35,6 +45,9 @@ public class NodeView extends AppCompatActivity {
 
         //Initialize Data
         InitializeData();
+
+        //Map Fragment
+        ShowMapFragment();
 
         //Gather data from itemclick
         gatherData();
@@ -57,6 +70,13 @@ public class NodeView extends AppCompatActivity {
 
     }
 
+    private void ShowMapFragment() {
+        FragmentManager fmanager = getSupportFragmentManager();
+        Fragment fragment = fmanager.findFragmentById(R.id.node_maps);
+        SupportMapFragment supportmapfragment = (SupportMapFragment)fragment;
+        GoogleMap supportMap = supportmapfragment.getMap();
+    }
+
     private void UpdateTitle() {
 
         //Set Title to Description
@@ -76,16 +96,28 @@ public class NodeView extends AppCompatActivity {
     private void InitializeData() {
         staticAddress_TV = (TextView)findViewById(R.id.nodeView_static);
         description_TV = (TextView)findViewById(R.id.nodeView_descrip);
-        latitude_TV = (TextView)findViewById(R.id.nodeView_lat);
-        longitude_TV = (TextView)findViewById(R.id.nodeView_long);
-        maps_Button = (Button)findViewById(R.id.node_maps);
+        latitude_TV = (TextView)findViewById(R.id.nodeView_lat_long);
+        maps_Button = (Button)findViewById(R.id.node_navigate);
     }
 
     private void populateData() {
         staticAddress_TV.setText(staticAddress);
         description_TV.setText(description);
-        latitude_TV.setText(latitude);
-        longitude_TV.setText(longitude);
+        String latlong = latitude + " / " + longitude;
+        latitude_TV.setText(latlong);
     }
 
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                new LatLng(41.889, -87.622), 16));
+
+        // You can customize the marker image using images bundled with
+        // your app, or dynamically generated bitmaps.
+        googleMap.addMarker(new MarkerOptions()
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_wifi_black_48dp))
+                .anchor(0.0f, 1.0f) // Anchors the marker on the bottom left
+                .position(new LatLng(41.889, -87.622)));
+    }
 }
+

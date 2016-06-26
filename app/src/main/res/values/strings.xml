@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">IPD</string>
     <string name="title">IP ADDRESS</string>
-    <string name="description">This is a description of something coool.</string>
+    <string name="description">Input random stuff here.</string>
     <string name="title_activity_node">Node</string>
     <string name="getgps">GetGPS</string>
     <string name="addnode">AddNode</string>
