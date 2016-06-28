@@ -150,7 +150,7 @@ public class NodeView extends AppCompatActivity implements OnMapReadyCallback {
             Log.i(TAG, "POPULATE DATA NODES: TITLE----> " + nodeObjectArrayList.get(i).getStaticAddress());
             String desc = nodeObjectArrayList.get(i).getDescription();
             Log.i(TAG, "POPULATE DATA NODES: SNIPPIT----> " + nodeObjectArrayList.get(i).getDescription());
-            int icon = R.drawable.ic_wifi_black_48dp;
+            int icon = R.drawable.ic_wifi_tethering_white_48dp;
             Log.i(TAG, "POPULATE DATA NODES: Node " + i);
 
             markerOptions = new MarkerOptions()
