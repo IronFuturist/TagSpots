@@ -210,6 +210,7 @@ public class NodeView extends AppCompatActivity implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap map) {
         googleMap = map;
+        googleMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
 
         googleMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
             @Override
@@ -222,26 +223,21 @@ public class NodeView extends AppCompatActivity implements OnMapReadyCallback {
                         .target(new LatLng(lat,lng))
                         .zoom(16)
                         .bearing(5)
-                        .tilt(75)
+                        .tilt(85)
                         .build();
 
-                googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(googlePlex), 2000, null);
+                googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(googlePlex), 1000, null);
 
                 populateMarkers();
             }
         });
-
-        googleMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
-
-        nodeObjectArrayList.size();
-
-
 
 
 
         googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
+                marker.showInfoWindow();
                 String id = marker.getId();
                 Toast.makeText(getApplicationContext(),id,Toast.LENGTH_SHORT).show();
                 return true;
