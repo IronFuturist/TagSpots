@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -17,6 +18,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -26,6 +28,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.megliosolutions.ipd.Objects.NodeObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class NodeView extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -41,6 +44,7 @@ public class NodeView extends AppCompatActivity implements OnMapReadyCallback {
     public String description;
     public double latitude;
     public double longitude;
+    public int position;
 
     public ArrayList<NodeObject> nodeObjectArrayList = new ArrayList<>();
     public ArrayList<MarkerOptions> nodeMarkersList = new ArrayList<>();
@@ -48,7 +52,9 @@ public class NodeView extends AppCompatActivity implements OnMapReadyCallback {
     public MapFragment mapFragment;
 
     public GoogleMap googleMap;
-    public MarkerOptions marker;
+    public Marker marker;
+    public MarkerOptions markerOptions;
+    private HashMap<Marker, NodeObject> nodeMarkerHashMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,9 +135,8 @@ public class NodeView extends AppCompatActivity implements OnMapReadyCallback {
     }
 
     private void populateMarkers() {
-        //NodeObjectList nodeObjectArrayList
-
-        //NodeMarkersList nodeMapMarkers
+        //Hash map
+        nodeMarkerHashMap = new HashMap<Marker, NodeObject>();
 
         Log.i(TAG, "POPULATE DATA NODES: ----> " + nodeObjectArrayList.size());
 
@@ -148,13 +153,13 @@ public class NodeView extends AppCompatActivity implements OnMapReadyCallback {
             int icon = R.drawable.ic_wifi_black_48dp;
             Log.i(TAG, "POPULATE DATA NODES: Node " + i);
 
-            marker = new MarkerOptions()
+            markerOptions = new MarkerOptions()
                     .position(new LatLng(lat,lng))
                     .title(ip)
                     .snippet(desc)
                     .icon(BitmapDescriptorFactory.fromResource(icon));
 
-            googleMap.addMarker(marker);
+            googleMap.addMarker(markerOptions);
         }
 
     }
@@ -185,6 +190,7 @@ public class NodeView extends AppCompatActivity implements OnMapReadyCallback {
         description = intent.getStringExtra("description");
         latitude = intent.getDoubleExtra("lat", 0.0);
         longitude = intent.getDoubleExtra("long", 0.0);
+        position = intent.getIntExtra("position",0);
     }
 
     private void InitializeData() {
@@ -204,54 +210,63 @@ public class NodeView extends AppCompatActivity implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap map) {
         googleMap = map;
-        map.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+
+        googleMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
+            @Override
+            public void onMapLoaded() {
+
+                double lat = latitude;
+                double lng = longitude;
+
+                CameraPosition googlePlex = CameraPosition.builder()
+                        .target(new LatLng(lat,lng))
+                        .zoom(16)
+                        .bearing(5)
+                        .tilt(75)
+                        .build();
+
+                googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(googlePlex), 2000, null);
+
+                populateMarkers();
+            }
+        });
+
+        googleMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+
+        nodeObjectArrayList.size();
 
 
 
-        double lat = nodeObjectArrayList.get(0).getLatitude();
-        double lng = nodeObjectArrayList.get(0).getLongitude();
 
-        CameraPosition googlePlex = CameraPosition.builder()
-                .target(new LatLng(lat,lng))
-                .zoom(16)
-                .bearing(5)
-                .tilt(75)
-                .build();
 
-        map.animateCamera(CameraUpdateFactory.newCameraPosition(googlePlex), 2000, null);
-
-        populateMarkers();
-
-        /*map.addMarker(new MarkerOptions()
-                .position(new LatLng(mlat, mlong))
-                .title(staticAddress)
-                .snippet(description))
-                .setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_wifi_black_48dp));
-
-        map.addMarker(new MarkerOptions()
-                .position(new LatLng(30.554365, -86.759503))
-                .title(staticAddress)
-                .snippet(description))
-                .setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_wifi_black_48dp));
-
-        map.addMarker(new MarkerOptions()
-                .position(new LatLng(30.528325, -86.730375))
-                .title(staticAddress)
-                .snippet(description))
-                .setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_wifi_black_48dp));
-
-        map.addMarker(new MarkerOptions()
-                .position(new LatLng(30.459509, -86.780702))
-                .title(staticAddress)
-                .snippet(description))
-                .setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_wifi_black_48dp));*/
+        googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                String id = marker.getId();
+                Toast.makeText(getApplicationContext(),id,Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        });
 
 
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        SetMap();
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
+        SetMap();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
     }
 }
 
