@@ -63,5 +63,6 @@
     <string name="enter_longitude">Enter Longitude</string>
     <string name="enter_description">Enter Description</string>
     <string name="refresh">refresh</string>
+    <string name="title_activity_maps">Map</string>
 
 </resources>

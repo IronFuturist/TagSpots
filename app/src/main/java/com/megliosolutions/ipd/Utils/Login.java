@@ -11,10 +11,13 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserInfo;
 import com.google.firebase.database.ChildEventListener;
@@ -26,6 +29,8 @@ import com.google.firebase.database.ValueEventListener;
 import com.megliosolutions.ipd.MainActivity;
 import com.megliosolutions.ipd.Objects.UserObject;
 import com.megliosolutions.ipd.R;
+
+import java.util.Arrays;
 
 public class Login extends BaseActivity {
 
@@ -196,6 +201,8 @@ public class Login extends BaseActivity {
                             // [START_EXCLUDE]
                             hideProgressDialog();
                             // [END_EXCLUDE]
+
+
                         }
 
 

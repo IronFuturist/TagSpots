@@ -3,6 +3,7 @@ package com.megliosolutions.ipd;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -18,6 +19,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.firebase.client.Firebase;
+import com.firebase.client.snapshot.Node;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
@@ -32,6 +34,7 @@ import com.megliosolutions.ipd.Objects.NodeObject;
 import com.megliosolutions.ipd.Objects.UserObject;
 import com.megliosolutions.ipd.Utils.Login;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -50,8 +53,8 @@ public class MainActivity extends AppCompatActivity {
     //Strings
     public String static_ip;
     public String desc;
-    public String lat;
-    public String mLong;
+    public double lat;
+    public double mLong;
     public String mKey;
     public String currentUser;
     public String getUsername;
@@ -74,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
 
         //Instances
         setInstances();
@@ -125,9 +129,11 @@ public class MainActivity extends AppCompatActivity {
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mNodeRef = mDatabase.child("nodes");
         currentUser = mUser.getUid();
+
     }
 
     private void setClickListeners() {
+
         //Set OnItemClick Listener
         //When clicked, it will go to a single view of the node
         //populating it's data
@@ -290,6 +296,8 @@ public class MainActivity extends AppCompatActivity {
                 listAdapter.notifyDataSetChanged();
                 listAdapter.setNotifyOnChange(true);
 
+                Log.i(TAG, "Num Of Nodes: " + listAdapter.mNodes.size());
+
                 Log.i(TAG, "Node Strings: " + listAdapter.mNodes.get(0).getKey());
             }
 
@@ -350,8 +358,11 @@ public class MainActivity extends AppCompatActivity {
             case R.id.refresh:
                //nothing
                 listAdapter.mNodes.clear();
+                listAdapter.notifyDataSetChanged();
                 retrieveMoreData();
                 Toast.makeText(getApplicationContext(), "Refreshed."
+                        , Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Nodes: " + listAdapter.mNodes.size()
                         , Toast.LENGTH_SHORT).show();
                 return true;
             case R.id.addNode:
@@ -405,8 +416,10 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int which) {
                 static_ip = editText.getText().toString();
                 desc = editText3.getText().toString();
-                lat = editText1.getText().toString();
-                mLong = editText2.getText().toString();
+                String tempLat = editText1.getText().toString();
+                String tempLong = editText2.getText().toString();
+                lat = Double.parseDouble(tempLat);
+                mLong = Double.parseDouble(tempLong);
                 node = new NodeObject(static_ip,desc,lat,mLong,mKey);
                 mDatabase.child("nodes").child(mKey).setValue(node);
                 Toast.makeText(getApplicationContext(), "Node: \n" + "Child Key:   " + mKey + "\n" +

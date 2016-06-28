@@ -2,6 +2,7 @@ package com.megliosolutions.ipd.Objects;
 
 import android.graphics.Bitmap;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -13,15 +14,15 @@ public class NodeObject {
 
     public String staticAddress;
     public String description;
-    public String latitude;
-    public String longitude;
+    public Double latitude;
+    public Double longitude;
     public String key;
 
     public NodeObject(){
         //needed for firebase
     }
 
-    public NodeObject(String staticAddress, String description, String latitude, String longitude, String key) {
+    public NodeObject(String staticAddress, String description, Double latitude, Double longitude, String key) {
         this.staticAddress = staticAddress;
         this.description = description;
         this.latitude = latitude;
@@ -37,11 +38,11 @@ public class NodeObject {
         return staticAddress;
     }
 
-    public String getLatitude() {
+    public Double getLatitude() {
         return latitude;
     }
 
-    public String getLongitude() {
+    public Double getLongitude() {
         return longitude;
     }
 
@@ -61,13 +62,14 @@ public class NodeObject {
         this.staticAddress = staticAddress;
     }
 
-    public void setLatitude(String latitude) {
+    public void setLatitude(Double latitude) {
         this.latitude = latitude;
     }
 
-    public void setLongitude(String longitude) {
+    public void setLongitude(Double longitude) {
         this.longitude = longitude;
     }
+
 
 
 }

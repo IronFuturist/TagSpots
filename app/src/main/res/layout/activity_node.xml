@@ -42,7 +42,7 @@
                 tools:ignore="MissingPrefix"
                 android:id="@+id/node_maps"
                 android:name="com.google.android.gms.maps.MapFragment"
-                android:layout_width="300dp"
+                android:layout_width="match_parent"
                 android:layout_height="200dp"
                 android:layout_alignParentTop="true"
                 android:layout_centerHorizontal="true"
@@ -129,7 +129,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Static IP:"
+                android:text="STATIC IP:"
                 android:id="@+id/node_text_ipAddress"
                 android:layout_below="@+id/node_maps"
                 android:layout_alignParentLeft="true"
@@ -141,7 +141,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Description:"
+                android:text="DESCRIPTION:"
                 android:id="@+id/node_text_description"
                 android:textColor="@color/textColor"
                 android:padding="8dp"
