@@ -68,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
 
     //Node Object
     NodeObject node;
+    NodeObject getNodes;
     //List of NodeObjects
     //Give default value
     public List<NodeObject> nodesList = new ArrayList<>();
@@ -281,11 +282,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void retrieveMoreData() {
 
-        mDatabase.child("nodes").addChildEventListener(new ChildEventListener() {
+       mDatabase.child("nodes").addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 Log.d(TAG, "onChildAdded:" + dataSnapshot.getKey());
-                NodeObject nodeObject = dataSnapshot.getValue(NodeObject.class);
+                getNodes = dataSnapshot.getValue(NodeObject.class);
 
 
                 keys = dataSnapshot.getKey();
@@ -293,7 +294,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.i(TAG, "HERE ARE THE KEYS BITCHES: " + keys);
 
 
-                listAdapter.add(nodeObject);
+                listAdapter.add(getNodes);
                 listAdapter.notifyDataSetChanged();
                 listAdapter.setNotifyOnChange(true);
 
@@ -441,8 +442,6 @@ public class MainActivity extends AppCompatActivity {
 
         dialogBuilder.create().show();
     }
-
-
     @Override
     protected void onResume() {
         super.onResume();
@@ -453,4 +452,8 @@ public class MainActivity extends AppCompatActivity {
         main_ListView.setAdapter(listAdapter);
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
 }
