@@ -21,136 +21,104 @@
         android:background="@color/colorPrimary">
     </android.support.v7.widget.Toolbar>
 
-
-
-    <android.support.v7.widget.CardView
-        android:id="@+id/card_view"
-        android:layout_width="match_parent"
-        app:cardCornerRadius="6dp"
+    <LinearLayout
+        android:orientation="vertical"
         android:background="#424242"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-        <RelativeLayout
+        <fragment
+            xmlns:android="http://schemas.android.com/apk/res/android"
+
+            tools:ignore="MissingPrefix"
+            android:id="@+id/node_maps"
+            android:name="com.google.android.gms.maps.MapFragment"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="#424242">
+            android:layout_height="250dp"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true" />
 
-            <fragment
-                xmlns:android="http://schemas.android.com/apk/res/android"
 
-                tools:ignore="MissingPrefix"
-                android:id="@+id/node_maps"
-                android:name="com.google.android.gms.maps.MapFragment"
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:layout_alignParentTop="true"
-                android:layout_centerHorizontal="true"
-                android:layout_margin="10dp"/>
-                <!--
-                xmlns:map="http://schemas.android.com/apk/res-auto"
-                map:cameraBearing="112.5"
-                map:cameraTargetLat="37.4220041"
-                map:cameraTargetLng="-122.0862515"
-                map:cameraTilt="30"
-                map:cameraZoom="13"
-                map:mapType="normal"
-                map:uiCompass="false"
-                map:uiRotateGestures="true"
-                map:uiScrollGestures="false"
-                map:uiTiltGestures="true"
-                map:uiZoomControls="false"
-                map:uiZoomGestures="true"
+                android:layout_height="match_parent"
+                android:padding="4dp">
 
-                map:mapType="hybrid"
-                -->
+                <TextView
+                    android:id="@+id/nodeView_static"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxLines="3"
+                    android:padding="8dp"
+                    android:text="@string/title"
+                    android:textColor="@color/textColor"
+                    android:textStyle="bold"
+                    android:textSize="22dp"
+                    android:layout_toRightOf="@+id/node_text_ipAddress"
+                    android:layout_toEndOf="@+id/node_text_ipAddress" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxLines="3"
+                    android:padding="8dp"
+                    android:text="@string/description"
+                    android:textColor="@color/textColor"
+                    android:textSize="14dp"
+                    android:id="@+id/nodeView_descrip"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_below="@+id/node_text_ipAddress" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="variables"
+                    android:padding="8dp"
+                    android:id="@+id/nodeView_lat_long"
+                    android:textColor="@color/textColor"
+                    android:layout_below="@+id/nodeView_descrip"
+                    android:layout_toRightOf="@+id/node_text_Latlong"
+                    android:layout_toEndOf="@+id/node_text_Latlong" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="LAT/LONG:"
+                    android:id="@+id/node_text_Latlong"
+                    android:padding="8dp"
+                    android:textColor="@color/textColor"
+                    android:layout_below="@+id/nodeView_descrip"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="STATIC IP:"
+                    android:id="@+id/node_text_ipAddress"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:textColor="@color/textColor"
+                    android:padding="8dp"
+                    android:textSize="22dp" />
+
+            </RelativeLayout>
+        </LinearLayout>
 
 
-            <TextView
-                android:id="@+id/nodeView_static"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:maxLines="3"
-                android:padding="8dp"
-                android:text="@string/title"
-                android:textColor="@color/textColor"
-                android:textStyle="bold"
-                android:textSize="22dp"
-                android:layout_below="@+id/node_maps"
-                android:layout_toRightOf="@+id/node_text_ipAddress"
-                android:layout_toEndOf="@+id/node_text_ipAddress" />
+    </LinearLayout>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:maxLines="3"
-                android:padding="8dp"
-                android:text="@string/description"
-                android:textColor="@color/textColor"
-                android:textSize="14dp"
-                android:id="@+id/nodeView_descrip"
-                android:layout_below="@+id/node_text_description"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="variables"
-                android:padding="8dp"
-                android:id="@+id/nodeView_lat_long"
-                android:textColor="@color/textColor"
-                android:layout_below="@+id/node_text_Latlong"
-                android:layout_alignLeft="@+id/node_text_Latlong"
-                android:layout_alignStart="@+id/node_text_Latlong" />
-
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Navigate"
-                android:id="@+id/node_navigate"
-                android:layout_centerHorizontal="true"
-                android:layout_below="@+id/nodeView_lat_long"
-                android:textColor="@color/colorAccent"
-                android:background="@color/colorPrimary"
-                android:layout_marginTop="20dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="LAT/LONG:"
-                android:id="@+id/node_text_Latlong"
-                android:padding="8dp"
-                android:textColor="@color/textColor"
-                android:layout_below="@+id/nodeView_descrip"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="STATIC IP:"
-                android:id="@+id/node_text_ipAddress"
-                android:layout_below="@+id/node_maps"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:textColor="@color/textColor"
-                android:padding="8dp"
-                android:textSize="22dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="DESCRIPTION:"
-                android:id="@+id/node_text_description"
-                android:textColor="@color/textColor"
-                android:padding="8dp"
-                android:layout_below="@+id/node_text_ipAddress"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true" />
-
-        </RelativeLayout>
-    </android.support.v7.widget.CardView>
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/listView"
+        android:layout_gravity="center_horizontal" />
 
 
 </LinearLayout>

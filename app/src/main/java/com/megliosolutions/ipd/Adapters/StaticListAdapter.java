@@ -43,7 +43,7 @@ public class StaticListAdapter extends ArrayAdapter<NodeObject> {
         ViewHolder holder = new ViewHolder();
         NodeObject node = mNodes.get(position);
         if (convertView == null) {
-            convertView = LayoutInflater.from(this.mContext).inflate(R.layout.node_item, null);
+            convertView = LayoutInflater.from(this.mContext).inflate(R.layout.node_header, null);
             holder.mStaticAddress = (TextView) convertView.findViewById(R.id.node_item_IP);
             holder.mDescription = (TextView) convertView.findViewById(R.id.node_item_desc);
             convertView.setTag(holder);

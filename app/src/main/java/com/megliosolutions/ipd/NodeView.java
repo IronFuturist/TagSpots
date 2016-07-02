@@ -1,8 +1,10 @@
 package com.megliosolutions.ipd;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -13,10 +15,12 @@ import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMapOptions;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -52,9 +56,11 @@ public class NodeView extends AppCompatActivity implements OnMapReadyCallback {
     public MapFragment mapFragment;
 
     public GoogleMap googleMap;
-    public Marker marker;
     public MarkerOptions markerOptions;
-    private HashMap<Marker, NodeObject> nodeMarkerHashMap;
+    public HashMap<Marker, NodeObject> nodeMarkerHashMap;
+
+    //Get position of node array item in map list
+    public int getPosition = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,8 +85,8 @@ public class NodeView extends AppCompatActivity implements OnMapReadyCallback {
         //Gather data from itemclick
         gatherData();
 
-        //Convert String to Double
-        //ConverStrToDble();
+        //Convert LatLong to MGRS
+        ConvertToMGRS();
 
         //ChangeTitle
         UpdateTitle();
@@ -88,7 +94,7 @@ public class NodeView extends AppCompatActivity implements OnMapReadyCallback {
         //Populate Data
         populateData();
 
-        maps_Button.setOnClickListener(new View.OnClickListener() {
+        /*maps_Button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Uri gmmIntentUri = Uri.parse("google.navigation:q=" + latitude + "," + longitude + "");
@@ -96,7 +102,12 @@ public class NodeView extends AppCompatActivity implements OnMapReadyCallback {
                 mapIntent.setPackage("com.google.android.apps.maps");
                 startActivity(mapIntent);
             }
-        });
+        });*/
+
+    }
+
+    private void ConvertToMGRS() {
+        //Convert Coordinates
 
     }
 
@@ -154,7 +165,7 @@ public class NodeView extends AppCompatActivity implements OnMapReadyCallback {
             Log.i(TAG, "POPULATE DATA NODES: Node " + i);
 
             markerOptions = new MarkerOptions()
-                    .position(new LatLng(lat,lng))
+                    .position(new LatLng(lat, lng))
                     .title(ip)
                     .snippet(desc)
                     .icon(BitmapDescriptorFactory.fromResource(icon));
@@ -169,9 +180,9 @@ public class NodeView extends AppCompatActivity implements OnMapReadyCallback {
             if (mapFragment == null) {
                 mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.node_maps);
                 mapFragment.getMapAsync(this);
+
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -190,14 +201,14 @@ public class NodeView extends AppCompatActivity implements OnMapReadyCallback {
         description = intent.getStringExtra("description");
         latitude = intent.getDoubleExtra("lat", 0.0);
         longitude = intent.getDoubleExtra("long", 0.0);
-        position = intent.getIntExtra("position",0);
+        position = intent.getIntExtra("position", 0);
     }
 
     private void InitializeData() {
         staticAddress_TV = (TextView) findViewById(R.id.nodeView_static);
         description_TV = (TextView) findViewById(R.id.nodeView_descrip);
         latitude_TV = (TextView) findViewById(R.id.nodeView_lat_long);
-        maps_Button = (Button) findViewById(R.id.node_navigate);
+        //maps_Button = (Button) findViewById(R.id.node_navigate);
     }
 
     private void populateData() {
@@ -208,8 +219,16 @@ public class NodeView extends AppCompatActivity implements OnMapReadyCallback {
     }
 
     @Override
-    public void onMapReady(GoogleMap map) {
+    public void onMapReady(GoogleMap map) throws SecurityException {
         googleMap = map;
+        googleMap.setMyLocationEnabled(true);
+        googleMap.getUiSettings().isCompassEnabled();
+        googleMap.getUiSettings().isMapToolbarEnabled();
+        googleMap.getUiSettings().isMyLocationButtonEnabled();
+        googleMap.getUiSettings().isRotateGesturesEnabled();
+        googleMap.getUiSettings().isTiltGesturesEnabled();
+        googleMap.getMaxZoomLevel();
+        googleMap.getMinZoomLevel();
         googleMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
 
         googleMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
@@ -221,7 +240,7 @@ public class NodeView extends AppCompatActivity implements OnMapReadyCallback {
 
                 CameraPosition googlePlex = CameraPosition.builder()
                         .target(new LatLng(lat,lng))
-                        .zoom(16)
+                        .zoom(10)
                         .bearing(5)
                         .tilt(85)
                         .build();
@@ -237,8 +256,16 @@ public class NodeView extends AppCompatActivity implements OnMapReadyCallback {
         googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
+                //Node Object for Map Marker Click
+                NodeObject nodeMarkerClickItem = new NodeObject();
+                String markerNodeKey = nodeMarkerClickItem.getKey();
+                Log.i(TAG, "MAP NODE CLICKED KEY: " + markerNodeKey);
+
+                //Show Marker Info Window
                 marker.showInfoWindow();
+
                 String id = marker.getId();
+
                 Toast.makeText(getApplicationContext(),id,Toast.LENGTH_SHORT).show();
                 return true;
             }
@@ -251,6 +278,11 @@ public class NodeView extends AppCompatActivity implements OnMapReadyCallback {
     protected void onStart() {
         super.onStart();
         SetMap();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 
     @Override
