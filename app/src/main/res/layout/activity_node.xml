@@ -58,9 +58,7 @@
                     android:text="@string/title"
                     android:textColor="@color/textColor"
                     android:textStyle="bold"
-                    android:textSize="22dp"
-                    android:layout_toRightOf="@+id/node_text_ipAddress"
-                    android:layout_toEndOf="@+id/node_text_ipAddress" />
+                    android:textSize="22dp" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -71,9 +69,9 @@
                     android:textColor="@color/textColor"
                     android:textSize="14dp"
                     android:id="@+id/nodeView_descrip"
+                    android:layout_below="@+id/nodeView_static"
                     android:layout_alignParentLeft="true"
-                    android:layout_alignParentStart="true"
-                    android:layout_below="@+id/node_text_ipAddress" />
+                    android:layout_alignParentStart="true" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -83,30 +81,8 @@
                     android:id="@+id/nodeView_lat_long"
                     android:textColor="@color/textColor"
                     android:layout_below="@+id/nodeView_descrip"
-                    android:layout_toRightOf="@+id/node_text_Latlong"
-                    android:layout_toEndOf="@+id/node_text_Latlong" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="LAT/LONG:"
-                    android:id="@+id/node_text_Latlong"
-                    android:padding="8dp"
-                    android:textColor="@color/textColor"
-                    android:layout_below="@+id/nodeView_descrip"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentStart="true" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="STATIC IP:"
-                    android:id="@+id/node_text_ipAddress"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentStart="true"
-                    android:textColor="@color/textColor"
-                    android:padding="8dp"
-                    android:textSize="22dp" />
 
             </RelativeLayout>
         </LinearLayout>

@@ -146,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
                 intent.putExtra("description",pos.getDescription());
                 intent.putExtra("lat",pos.getLatitude());
                 intent.putExtra("long",pos.getLongitude());
-                intent.putExtra("position", String.valueOf(pos));
+                intent.putExtra("key", pos.getKey());
                 startActivity(intent);
                 //Bring Data with
             }
