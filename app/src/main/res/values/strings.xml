@@ -7,6 +7,9 @@
     <string name="addnode">AddNode</string>
     <string name="title_activity_login">Login</string>
 
+    <string name="drawer_open">open</string>
+    <string name="drawer_close">close</string>
+
 
     <string name="label_google_sign_in">Firebase + Google Sign In</string>
     <string name="desc_google_sign_in">Use a Google Sign In credential to authenticate with Firebase.</string>
@@ -64,5 +67,11 @@
     <string name="enter_description">Enter Description</string>
     <string name="refresh">refresh</string>
     <string name="title_activity_maps">Map</string>
+    <string name="title_activity_nav_drawer">NavDrawer</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
 
 </resources>

@@ -2,9 +2,13 @@ package com.megliosolutions.ipd;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.ListViewCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,13 +16,16 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMapOptions;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -34,6 +41,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.megliosolutions.ipd.Adapters.StaticListAdapter;
 import com.megliosolutions.ipd.Objects.NodeObject;
 import com.megliosolutions.ipd.Utils.Login;
 
@@ -83,11 +91,16 @@ public class NodeView extends AppCompatActivity implements OnMapReadyCallback {
     public MapFragment mapFragment;
 
     public GoogleMap googleMap;
+    public GoogleMapOptions googleMapOptions;
     public MarkerOptions markerOptions;
     public HashMap<Marker, NodeObject> nodeMarkerHashMap;
 
     //Get position of node array item in map list
     public int getPosition = 0;
+
+    public ListView subView;
+
+    public StaticListAdapter listAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,10 +108,14 @@ public class NodeView extends AppCompatActivity implements OnMapReadyCallback {
         setContentView(R.layout.activity_node);
 
 
+
         //SetToolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        //Set List to view
+        subView = (ListView) findViewById(R.id.listView);
 
         //Gather data from itemclick
         gatherData();
@@ -109,6 +126,9 @@ public class NodeView extends AppCompatActivity implements OnMapReadyCallback {
         //Bring over list
         bringNodes();
         bringSubNodes();
+
+        //Set Adapter
+        SetAdapter();
 
         //SetMap
         SetMap();
@@ -127,6 +147,35 @@ public class NodeView extends AppCompatActivity implements OnMapReadyCallback {
 
         //Log Data
         logDataFromVariables();
+
+        //Set SubNode Click
+        subNodeClick();
+    }
+
+    private void SetAdapter() {
+        //ListAdapter stuff
+        listAdapter = new StaticListAdapter(getApplicationContext(), subNodeArrayList);
+
+        //ListView stuff
+        if (subNodeArrayList == null) {
+            Log.e(TAG, "NODESLIST IS NULL");
+        } else {
+
+            subView.setAdapter(listAdapter);
+        }
+    }
+
+    private void subNodeClick() {
+        subView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                NodeObject pos = listAdapter.mNodes.get(position);
+                staticAddress_TV.setText(pos.getStaticAddress());
+                description_TV.setText(pos.getDescription());
+                String latlong = pos.getLatitude() + ", " + pos.getLongitude();
+                latitude_TV.setText(latlong);
+            }
+        });
     }
 
     private void logDataFromVariables() {
@@ -147,7 +196,7 @@ public class NodeView extends AppCompatActivity implements OnMapReadyCallback {
 
     private void GenerateKey() {
         mKey = mSubNodeRef.push().getKey();
-        if(mKey.equalsIgnoreCase(mKey)){
+        if (mKey.equalsIgnoreCase(mKey)) {
             mKey = mSubNodeRef.push().getKey();
             Log.i(TAG, "NEW SUBNODE CHILD KEY: " + mKey);
         }
@@ -194,7 +243,7 @@ public class NodeView extends AppCompatActivity implements OnMapReadyCallback {
         mNodeRef.addChildEventListener(childEventListener);
     }
 
-    private void bringSubNodes(){
+    private void bringSubNodes() {
         ChildEventListener subNodesListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -263,7 +312,6 @@ public class NodeView extends AppCompatActivity implements OnMapReadyCallback {
             if (mapFragment == null) {
                 mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.node_maps);
                 mapFragment.getMapAsync(this);
-
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -286,6 +334,7 @@ public class NodeView extends AppCompatActivity implements OnMapReadyCallback {
         longitude = intent.getDoubleExtra("long", 0.0);
         selectedKey = intent.getStringExtra("key");
         Log.i(TAG, "gatherData-SelectedKey: " + selectedKey);
+        SetMap();
     }
 
     private void InitializeData() {
@@ -312,8 +361,21 @@ public class NodeView extends AppCompatActivity implements OnMapReadyCallback {
         googleMap.getUiSettings().isTiltGesturesEnabled();
         googleMap.getMaxZoomLevel();
         googleMap.getMinZoomLevel();
-        googleMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
 
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+
+            //Request permissions method
+
+            return;
+        }
+        googleMap.setMyLocationEnabled(true);
         googleMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
             @Override
             public void onMapLoaded() {
@@ -353,7 +415,6 @@ public class NodeView extends AppCompatActivity implements OnMapReadyCallback {
                 return true;
             }
         });
-
 
     }
 
@@ -471,5 +532,13 @@ public class NodeView extends AppCompatActivity implements OnMapReadyCallback {
         super.onPause();
 
     }
+
+    private void showPhoneStatePermission() {
+        //Do permission check for GPS
+        //ACCESS_FINE_LOCATION
+        //ACCESS_COARSE_LOCATION
+
+    }
+
 }
 

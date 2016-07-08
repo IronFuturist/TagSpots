@@ -3,7 +3,8 @@ package com.megliosolutions.ipd;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcelable;
+import android.os.Handler;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -14,6 +15,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -25,24 +27,27 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.megliosolutions.ipd.Adapters.StaticListAdapter;
 import com.megliosolutions.ipd.Objects.NodeObject;
 import com.megliosolutions.ipd.Objects.UserObject;
+import com.megliosolutions.ipd.Utils.Arrays;
 import com.megliosolutions.ipd.Utils.Login;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
     //TAG STRING
     public static String TAG = MainActivity.class.getSimpleName();
 
+
+    //Views
     public ListView main_ListView;
+    public SwipeRefreshLayout mSwipeRefreshLayout;
+
+    //Firebase
     public FirebaseAuth mAuth;
     public FirebaseUser mUser;
     public DatabaseReference mDatabase;
@@ -51,12 +56,15 @@ public class MainActivity extends AppCompatActivity {
     //Strings
     public String static_ip;
     public String desc;
-    public double lat;
-    public double mLong;
     public String mKey;
     public String currentUser;
     public String getUsername;
     public String setUsername;
+    public String keys;
+
+    //doubles
+    public double lat;
+    public double mLong;
 
     //Adapters
     public StaticListAdapter listAdapter;
@@ -64,19 +72,20 @@ public class MainActivity extends AppCompatActivity {
     //UserObject
     public UserObject dude;
 
+
     //Node Object
     NodeObject node;
     NodeObject getNodes;
+
     //List of NodeObjects
     //Give default value
     public List<NodeObject> nodesList = new ArrayList<>();
-    public String keys;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
 
         //Instances
         setInstances();
@@ -89,20 +98,95 @@ public class MainActivity extends AppCompatActivity {
 
         //Toolbar
         setToolbar();
-        //[End of Toolbar]
 
         //Generate key for nodes
         GenerateKey();
 
         //Set Adapter
         SetAdapter();
+
         //Set ClickListeners
         setClickListeners();
 
         //Logstuff
         logDataFromVariables();
 
+    }
 
+    private void setInstances() {
+        mAuth = FirebaseAuth.getInstance();
+        mUser = mAuth.getCurrentUser();
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        mNodeRef = mDatabase.child("nodes");
+        currentUser = mUser.getUid();
+
+    }
+
+    private void checkUsername() {
+
+        mDatabase.child("users").child(mUser.getUid()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Log.i(TAG, "USER KEY : " + dataSnapshot.getKey());
+                Log.i(TAG, "USER INFO: " + dataSnapshot.child("username").getValue());
+                getUsername = (String) dataSnapshot.child("username").getValue();
+                setUserTitle();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.i(TAG, "USER INFO-ERROR: " + databaseError.getMessage());
+            }
+        });
+    }
+
+
+    private void setUserTitle() {
+        if(getUsername.equalsIgnoreCase("")) {
+            //AlertDialog
+            final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MainActivity.this);
+            dialogBuilder.setTitle("Umm...Username?");
+            LayoutInflater inflater = MainActivity.this.getLayoutInflater();
+            View dialogView = inflater.inflate(R.layout.main_add_username, null);
+            dialogBuilder.setView(dialogView);
+            final EditText editText = (EditText)
+                    dialogView.findViewById(R.id.main_username_et);
+            dialogBuilder.setPositiveButton("Set Username", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    setUsername = editText.getText().toString();
+                    String username = setUsername;
+                    mDatabase.child("users").child(mUser.getUid()).child("username").setValue(username);
+                    setTitle(username);
+                    Toast.makeText(getApplicationContext(), "Username: " + username + " assigned!"
+                            , Toast.LENGTH_SHORT).show();
+                }
+            }).
+                    setNegativeButton("Or Not...", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Toast.makeText(getApplicationContext(), "Fine, nvm then..."
+                                    , Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+            dialogBuilder.create().show();
+        }else{
+            setUsername = getUsername;
+            setTitle(setUsername);
+        }
+    }
+
+    private void InitializeStuff() {
+        main_ListView = (ListView)findViewById(R.id.Main_listview);
+    }
+
+    private void setToolbar() {
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
     }
 
     private void GenerateKey() {
@@ -122,12 +206,18 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void setInstances() {
-        mAuth = FirebaseAuth.getInstance();
-        mUser = mAuth.getCurrentUser();
-        mDatabase = FirebaseDatabase.getInstance().getReference();
-        mNodeRef = mDatabase.child("nodes");
-        currentUser = mUser.getUid();
+    private void SetAdapter() {
+        //ListAdapter stuff
+        listAdapter = new StaticListAdapter(getApplicationContext(),nodesList);
+
+        //ListView stuff
+        if(nodesList==null){
+            Log.e(TAG, "NODESLIST IS NULL");
+        }else{
+            //listAdapter.sort();
+            main_ListView.setAdapter(listAdapter);
+        }
+
 
     }
 
@@ -195,87 +285,7 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
-    }
 
-    private void InitializeStuff() {
-        main_ListView = (ListView)findViewById(R.id.Main_listview);
-    }
-
-    private void setToolbar() {
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-    }
-
-    private void SetAdapter() {
-        //ListAdapter stuff
-        listAdapter = new StaticListAdapter(getApplicationContext(),nodesList);
-
-        //ListView stuff
-        if(nodesList==null){
-            Log.e(TAG, "NODESLIST IS NULL");
-        }else{
-
-            main_ListView.setAdapter(listAdapter);
-        }
-    }
-
-    private void checkUsername() {
-
-        mDatabase.child("users").child(mUser.getUid()).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Log.i(TAG, "USER KEY : " + dataSnapshot.getKey());
-                Log.i(TAG, "USER INFO: " + dataSnapshot.child("username").getValue());
-                getUsername = (String) dataSnapshot.child("username").getValue();
-                setUserTitle();
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.i(TAG, "USER INFO-ERROR: " + databaseError.getMessage());
-            }
-        });
-
-
-    }
-
-    private void setUserTitle() {
-        if(getUsername.equalsIgnoreCase("")) {
-            //AlertDialog
-            final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MainActivity.this);
-            dialogBuilder.setTitle("Umm...Username?");
-            LayoutInflater inflater = MainActivity.this.getLayoutInflater();
-            View dialogView = inflater.inflate(R.layout.main_add_username, null);
-            dialogBuilder.setView(dialogView);
-            final EditText editText = (EditText)
-                    dialogView.findViewById(R.id.main_username_et);
-            dialogBuilder.setPositiveButton("Set Username", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    setUsername = editText.getText().toString();
-                    String username = setUsername;
-                    mDatabase.child("users").child(mUser.getUid()).child("username").setValue(username);
-                    setTitle(username);
-                    Toast.makeText(getApplicationContext(), "Username: " + username + " assigned!"
-                            , Toast.LENGTH_SHORT).show();
-                }
-            }).
-                    setNegativeButton("Or Not...", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            Toast.makeText(getApplicationContext(), "Fine, nvm then..."
-                                    , Toast.LENGTH_SHORT).show();
-                        }
-                    });
-
-            dialogBuilder.create().show();
-        }else{
-            setUsername = getUsername;
-            setTitle(setUsername);
-        }
     }
 
     private void retrieveMoreData() {
@@ -362,6 +372,7 @@ public class MainActivity extends AppCompatActivity {
                 retrieveMoreData();
                 Toast.makeText(getApplicationContext(), "Refreshed."
                         , Toast.LENGTH_SHORT).show();
+                listAdapter.mNodes.size();
                 Toast.makeText(getApplicationContext(), "Nodes: " + listAdapter.mNodes.size()
                         , Toast.LENGTH_SHORT).show();
                 return true;
@@ -454,4 +465,5 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
     }
+
 }
