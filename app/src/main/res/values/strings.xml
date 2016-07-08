@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">IPD</string>
+    <string name="app_name">Pobail</string>
     <string name="title">IP ADDRESS</string>
     <string name="description">Input random stuff here.</string>
     <string name="title_activity_node">Node</string>
