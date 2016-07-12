@@ -73,6 +73,10 @@ public class MainActivity extends AppCompatActivity {
     public String getUsername;
     public String setUsername;
     public String keys;
+    public static final String TAG_MAPVIEW_FRAGMENT = "TAG_MAPVIEW_FRAGMENT";
+    public static final String TAG_HASHTAG_FRAGMENT = "TAG_HASHTAG_FRAGMENT";
+    public static final String TAG_SETTINGS_FRAGMENT = "TAG_SETTINGS_FRAGMENT";
+    public static final String TAG_FRIENDS_FRAGMENT = "TAG_FRIENDS_FRAGMENT";
 
     //doubles
     public double lat;
@@ -238,11 +242,10 @@ public class MainActivity extends AppCompatActivity {
         main_ListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //Go to NodeView
-
-                //Go to Fragment
-
-
+                //Go to MapView Fragment
+                mapView = new MapView();
+                fragmentManager = getSupportFragmentManager();
+                //Replace intent with Bundle and put it in the transaction
                 NodeObject pos = listAdapter.mNodes.get(position);
                 Intent intent = new Intent(MainActivity.this, MapView.class);
                 intent.putExtra("staticIP",pos.getStaticAddress());
@@ -251,6 +254,11 @@ public class MainActivity extends AppCompatActivity {
                 intent.putExtra("long",pos.getLongitude());
                 intent.putExtra("key", pos.getKey());
                 startActivity(intent);
+                fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.add(R.id.fragment_view_mapview,mapView);
+                fragmentTransaction.commit();
+
+
                 //Bring Data with
             }
         });

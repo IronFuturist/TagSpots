@@ -95,7 +95,7 @@ public class MapView extends Fragment implements OnMapReadyCallback {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.activity_node,container,false);
+        view = inflater.inflate(R.layout.fragment_mapview,container,false);
 
         mainActivity = (MainActivity) getActivity();
 
