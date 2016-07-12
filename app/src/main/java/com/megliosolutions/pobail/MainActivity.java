@@ -3,7 +3,6 @@ package com.megliosolutions.pobail;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -15,7 +14,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -29,9 +27,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.megliosolutions.pobail.Adapters.StaticListAdapter;
+import com.megliosolutions.pobail.Fragments.MapView;
 import com.megliosolutions.pobail.Objects.NodeObject;
 import com.megliosolutions.pobail.Objects.UserObject;
-import com.megliosolutions.pobail.Utils.Arrays;
 import com.megliosolutions.pobail.Utils.Login;
 
 import java.util.ArrayList;
@@ -230,8 +228,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 //Go to NodeView
+
+                //Go to Fragment
+
+
                 NodeObject pos = listAdapter.mNodes.get(position);
-                Intent intent = new Intent(MainActivity.this, NodeView.class);
+                Intent intent = new Intent(MainActivity.this, MapView.class);
                 intent.putExtra("staticIP",pos.getStaticAddress());
                 intent.putExtra("description",pos.getDescription());
                 intent.putExtra("lat",pos.getLatitude());

@@ -27,16 +27,6 @@
             android:name=".MainActivity"
             android:screenOrientation="portrait"></activity>
         <activity
-            android:name=".NodeView"
-            android:label="@string/title_activity_node"
-            android:parentActivityName=".MainActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.megliosolutions.ipd.MainActivity" />
-        </activity>
-        <activity
             android:name=".Utils.Login"
             android:label="@string/title_activity_login"
             android:screenOrientation="portrait"

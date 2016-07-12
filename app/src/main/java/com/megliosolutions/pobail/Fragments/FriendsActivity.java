@@ -1,4 +1,4 @@
-package com.megliosolutions.pobail.Users;
+package com.megliosolutions.pobail.Fragments;
 
 import android.app.Fragment;
 import android.os.Bundle;
