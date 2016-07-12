@@ -3,7 +3,8 @@ package com.megliosolutions.pobail;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -27,7 +28,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.megliosolutions.pobail.Adapters.StaticListAdapter;
+import com.megliosolutions.pobail.Fragments.FriendsActivity;
+import com.megliosolutions.pobail.Fragments.HashTag;
 import com.megliosolutions.pobail.Fragments.MapView;
+import com.megliosolutions.pobail.Fragments.Settings;
 import com.megliosolutions.pobail.Objects.NodeObject;
 import com.megliosolutions.pobail.Objects.UserObject;
 import com.megliosolutions.pobail.Utils.Login;
@@ -43,7 +47,17 @@ public class MainActivity extends AppCompatActivity {
 
     //Views
     public ListView main_ListView;
-    public SwipeRefreshLayout mSwipeRefreshLayout;
+
+    //FragmentManager & Transaction
+    public FragmentManager fragmentManager;
+    public FragmentTransaction fragmentTransaction;
+
+    //Fragments
+    public MapView mapView;
+    public Settings mSettings;
+    public HashTag mHashTag;
+    public FriendsActivity mFriendsActivity;
+
 
     //Firebase
     public FirebaseAuth mAuth;
@@ -67,13 +81,10 @@ public class MainActivity extends AppCompatActivity {
     //Adapters
     public StaticListAdapter listAdapter;
 
-    //UserObject
-    public UserObject dude;
-
-
-    //Node Object
-    NodeObject node;
-    NodeObject getNodes;
+    //Objects
+    public UserObject userObject;
+    public NodeObject node;
+    public NodeObject getNodes;
 
     //List of NodeObjects
     //Give default value
