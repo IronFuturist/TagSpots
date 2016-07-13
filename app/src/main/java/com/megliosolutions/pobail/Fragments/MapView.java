@@ -1,10 +1,13 @@
 package com.megliosolutions.pobail.Fragments;
 
 
+import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
@@ -86,49 +89,32 @@ public class MapView extends Fragment implements OnMapReadyCallback {
 
     public View view;
 
-    //Get position of node array item in map list
-    public int getPosition = 0;
-
     //Main Activity
     MainActivity mainActivity;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_mapview,container,false);
-
-        mainActivity = (MainActivity) getActivity();
-
-        if (mainActivity.getSupportActionBar() != null) {
-            mainActivity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
-        Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
-        mainActivity.setSupportActionBar(toolbar);
+        view = inflater.inflate(R.layout.fragment_mapview, container, false);
 
         //Gather data from itemclick
-        gatherData();
+        //gatherData();
 
         //Set Instances
         setInstances();
 
         //Bring over list
         bringNodes();
-        bringSubNodes();
+        //bringSubNodes();
 
         //SetMap
         SetMap();
-
-        //Initialize Data
-        InitializeData();
 
         //Convert LatLong to MGRS
         //ConvertToMGRS();
 
         //ChangeTitle
-        UpdateTitle();
-
-        //Populate Data
-        populateData();
+        //UpdateTitle();
 
         //Log Data
         logDataFromVariables();
@@ -147,14 +133,14 @@ public class MapView extends Fragment implements OnMapReadyCallback {
         mUser = mAuth.getCurrentUser();
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mNodeRef = mDatabase.child(childNode);
-        mSubNodeRef = mDatabase.child(childNode).child(selectedKey).child(childSubNode);
+        //mSubNodeRef = mDatabase.child(childNode).child(selectedKey).child(childSubNode);
         Log.i(TAG, "SetInstances-SelectedKey: " + selectedKey);
         currentUser = mUser.getUid();
     }
 
     private void GenerateKey() {
         mKey = mSubNodeRef.push().getKey();
-        if(mKey.equalsIgnoreCase(mKey)){
+        if (mKey.equalsIgnoreCase(mKey)) {
             mKey = mSubNodeRef.push().getKey();
             Log.i(TAG, "NEW SUBNODE CHILD KEY: " + mKey);
         }
@@ -201,7 +187,7 @@ public class MapView extends Fragment implements OnMapReadyCallback {
         mNodeRef.addChildEventListener(childEventListener);
     }
 
-    private void bringSubNodes(){
+    private void bringSubNodes() {
         ChildEventListener subNodesListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -280,7 +266,7 @@ public class MapView extends Fragment implements OnMapReadyCallback {
     private void UpdateTitle() {
 
         //Set Title to Description
-        getActivity().setTitle(description);
+        getActivity().setTitle("I shouldn't be here...");
 
     }
 
@@ -295,73 +281,12 @@ public class MapView extends Fragment implements OnMapReadyCallback {
         Log.i(TAG, "gatherData-SelectedKey: " + selectedKey);
     }
 
-    private void InitializeData() {
-        staticAddress_TV = (TextView) view.findViewById(R.id.nodeView_static);
-        description_TV = (TextView) view.findViewById(R.id.nodeView_descrip);
-        latitude_TV = (TextView) view.findViewById(R.id.nodeView_lat_long);
-        //maps_Button = (Button) findViewById(R.id.node_navigate);
-    }
-
-    private void populateData() {
-        staticAddress_TV.setText(staticAddress);
-        description_TV.setText(description);
-        String latlong = latitude + ", " + longitude;
-        latitude_TV.setText(latlong);
-    }
 
     @Override
     public void onMapReady(GoogleMap map) {
         googleMap = map;
-        googleMap.getUiSettings().isCompassEnabled();
-        googleMap.getUiSettings().isMapToolbarEnabled();
-        googleMap.getUiSettings().isMyLocationButtonEnabled();
-        googleMap.getUiSettings().isRotateGesturesEnabled();
-        googleMap.getUiSettings().isTiltGesturesEnabled();
-        googleMap.getMaxZoomLevel();
-        googleMap.getMinZoomLevel();
         googleMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
-
-        googleMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
-            @Override
-            public void onMapLoaded() {
-
-                double lat = latitude;
-                double lng = longitude;
-
-                CameraPosition googlePlex = CameraPosition.builder()
-                        .target(new LatLng(lat,lng))
-                        .zoom(10)
-                        .bearing(5)
-                        .tilt(85)
-                        .build();
-
-                googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(googlePlex), 1000, null);
-
-                populateMarkers();
-            }
-        });
-
-
-
-        googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-            @Override
-            public boolean onMarkerClick(Marker marker) {
-                //Node Object for Map Marker Click
-                NodeObject nodeMarkerClickItem = new NodeObject();
-                String markerNodeKey = nodeMarkerClickItem.getKey();
-                Log.i(TAG, "MAP NODE CLICKED KEY: " + markerNodeKey);
-
-                //Show Marker Info Window
-                marker.showInfoWindow();
-
-                String id = marker.getId();
-
-                Toast.makeText(getActivity(),id,Toast.LENGTH_SHORT).show();
-                return true;
-            }
-        });
-
-
+        googleMap.isMyLocationEnabled();
     }
 
     private void addNode() {

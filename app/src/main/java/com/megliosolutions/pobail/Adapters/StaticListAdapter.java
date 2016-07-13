@@ -29,6 +29,11 @@ public class StaticListAdapter extends ArrayAdapter<NodeObject> {
     }
 
     @Override
+    public int getPosition(NodeObject item) {
+        return super.getPosition(item);
+    }
+
+    @Override
     public int getCount() {
         return mNodes.size();
     }

@@ -54,10 +54,16 @@ public class MainActivity extends AppCompatActivity {
 
     //Fragments
     public MapView mapView;
+    public MapView SavedMapView;
     public Settings mSettings;
+    public Settings mSavedSettings;
     public HashTag mHashTag;
+    public HashTag mSavedHashTag;
     public FriendsActivity mFriendsActivity;
+    public FriendsActivity mSavedFriendsActivity;
 
+    //Bundle
+    public Bundle bundle;
 
     //Firebase
     public FirebaseAuth mAuth;
@@ -82,6 +88,9 @@ public class MainActivity extends AppCompatActivity {
     public double lat;
     public double mLong;
 
+    //ints
+    public int position = 0;
+
     //Adapters
     public StaticListAdapter listAdapter;
 
@@ -100,6 +109,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //Set FrameLayout
+        SetFrameLayout();
+
         //Instances
         setInstances();
 
@@ -113,17 +125,27 @@ public class MainActivity extends AppCompatActivity {
         setToolbar();
 
         //Generate key for nodes
-        GenerateKey();
+        //GenerateKey();
 
         //Set Adapter
-        SetAdapter();
+        //SetAdapter();
 
         //Set ClickListeners
-        setClickListeners();
+        //setClickListeners();
 
         //Logstuff
-        logDataFromVariables();
+        //logDataFromVariables();
 
+    }
+
+    private void SetFrameLayout() {
+        mapView = new MapView();
+        fragmentManager = getSupportFragmentManager();
+        //Replace intent with Bundle and put it in the transaction
+        fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.add(R.id.main_FrameLayout,mapView);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
     }
 
     private void setInstances() {
@@ -191,7 +213,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void InitializeStuff() {
-        main_ListView = (ListView)findViewById(R.id.Main_listview);
+        //disregard for now
+        //main_ListView = (ListView)findViewById(R.id.Main_listview);
     }
 
     private void setToolbar() {
@@ -243,20 +266,26 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 //Go to MapView Fragment
-                mapView = new MapView();
-                fragmentManager = getSupportFragmentManager();
-                //Replace intent with Bundle and put it in the transaction
-                NodeObject pos = listAdapter.mNodes.get(position);
-                Intent intent = new Intent(MainActivity.this, MapView.class);
-                intent.putExtra("staticIP",pos.getStaticAddress());
-                intent.putExtra("description",pos.getDescription());
-                intent.putExtra("lat",pos.getLatitude());
-                intent.putExtra("long",pos.getLongitude());
-                intent.putExtra("key", pos.getKey());
-                startActivity(intent);
-                fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.add(R.id.fragment_view_mapview,mapView);
-                fragmentTransaction.commit();
+                /*SavedMapView = (MapView) getSupportFragmentManager()
+                        .findFragmentByTag(TAG_MAPVIEW_FRAGMENT);
+                if(SavedMapView == null){
+                    mapView = new MapView();
+                   *//* NodeObject pos = listAdapter.mNodes.get(position);
+                    bundle = new Bundle();
+                    bundle.putString("staticIP",pos.getStaticAddress());
+                    bundle.putString("description",pos.getDescription());
+                    bundle.putDouble("lat",pos.getLatitude());
+                    bundle.putDouble("long",pos.getLongitude());
+                    bundle.putString("key", pos.getKey());
+                    mapView.setArguments(bundle);*//*
+                    fragmentManager = getSupportFragmentManager();
+                    //Replace intent with Bundle and put it in the transaction
+                    fragmentTransaction = fragmentManager.beginTransaction();
+                    fragmentTransaction.add(R.id.fragment_view_mapview,mapView);
+                    fragmentTransaction.addToBackStack(null);
+                    fragmentTransaction.commit();*/
+
+
 
 
                 //Bring Data with
@@ -475,11 +504,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        listAdapter.clear();
-        retrieveMoreData();
-        Log.i(TAG, "Node Size: " + listAdapter.mNodes.size() +"");
-        listAdapter.notifyDataSetChanged();
-        main_ListView.setAdapter(listAdapter);
+        //listAdapter.clear();
+        //retrieveMoreData();
+        //Log.i(TAG, "Node Size: " + listAdapter.mNodes.size() +"");
+        //listAdapter.notifyDataSetChanged();
+        //main_ListView.setAdapter(listAdapter);
     }
 
     @Override
