@@ -2,11 +2,13 @@ package com.megliosolutions.pobail;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.os.PersistableBundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -16,8 +18,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -35,7 +35,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.megliosolutions.pobail.Adapters.StaticListAdapter;
-import com.megliosolutions.pobail.Fragments.FriendsActivity;
 import com.megliosolutions.pobail.Fragments.HashTag;
 import com.megliosolutions.pobail.Fragments.MapView;
 import com.megliosolutions.pobail.Fragments.Settings;
@@ -50,6 +49,8 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String SELECTED_ITEM_ID = "selected_item_id";
+    private static final String FIRST_TIME = "first_time";
+
     //TAG STRING
     public static String TAG = MainActivity.class.getSimpleName();
 
@@ -100,7 +101,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public StaticListAdapter listAdapter;
 
     //booleans
-
+    public boolean mUserSawDrawer = false;
 
     //Objects
     public UserObject userObject;
@@ -121,6 +122,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //Shared Preferences
+        setSharedPreferenceDrawer();
+
+        //Check if user has seen drawer
+        didUserSeeDrawer();
 
         //Setup Nav Drawer stuff
         setViews();
@@ -158,6 +165,27 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //Navigate to ID
         navToID(mSelectedID);
 
+    }
+
+    private void didUserSeeDrawer() {
+        if(!setSharedPreferenceDrawer()){
+            openDrawer();
+            markDrawerAsShown();
+        }
+        else {
+            closeDrawer();
+        }
+    }
+
+    private boolean setSharedPreferenceDrawer() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPreferences.getBoolean(FIRST_TIME, false);
+        return mUserSawDrawer;
+    }
+    private void markDrawerAsShown(){
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        mUserSawDrawer = true;
+        sharedPreferences.edit().putBoolean(FIRST_TIME,mUserSawDrawer).apply();
     }
 
     private void navToID(int mSelectedID) {
@@ -616,6 +644,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
+    public void openDrawer(){
+        mDrawerLayout.openDrawer(GravityCompat.START);
+    }
+
+    public void closeDrawer(){
+        mDrawerLayout.closeDrawer(GravityCompat.START);
+    }
+
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
@@ -627,5 +663,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onSaveInstanceState(outState, outPersistentState);
 
         outState.putInt(SELECTED_ITEM_ID, mSelectedID);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(mDrawerLayout.isDrawerOpen(GravityCompat.START)){
+            mDrawerLayout.closeDrawer(GravityCompat.START);
+        }else{
+            super.onBackPressed();
+        }
+
     }
 }
