@@ -2,9 +2,15 @@ package com.megliosolutions.pobail;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
+import android.os.PersistableBundle;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -17,6 +23,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -32,6 +39,7 @@ import com.megliosolutions.pobail.Fragments.FriendsActivity;
 import com.megliosolutions.pobail.Fragments.HashTag;
 import com.megliosolutions.pobail.Fragments.MapView;
 import com.megliosolutions.pobail.Fragments.Settings;
+import com.megliosolutions.pobail.Fragments.UserProfile;
 import com.megliosolutions.pobail.Objects.NodeObject;
 import com.megliosolutions.pobail.Objects.UserObject;
 import com.megliosolutions.pobail.Utils.Login;
@@ -39,14 +47,16 @@ import com.megliosolutions.pobail.Utils.Login;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
+    private static final String SELECTED_ITEM_ID = "selected_item_id";
     //TAG STRING
     public static String TAG = MainActivity.class.getSimpleName();
 
 
     //Views
     public ListView main_ListView;
+    public TextView nav_Header;
 
     //FragmentManager & Transaction
     public FragmentManager fragmentManager;
@@ -54,13 +64,6 @@ public class MainActivity extends AppCompatActivity {
 
     //Fragments
     public MapView mapView;
-    public MapView SavedMapView;
-    public Settings mSettings;
-    public Settings mSavedSettings;
-    public HashTag mHashTag;
-    public HashTag mSavedHashTag;
-    public FriendsActivity mFriendsActivity;
-    public FriendsActivity mSavedFriendsActivity;
 
     //Bundle
     public Bundle bundle;
@@ -83,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
     public static final String TAG_HASHTAG_FRAGMENT = "TAG_HASHTAG_FRAGMENT";
     public static final String TAG_SETTINGS_FRAGMENT = "TAG_SETTINGS_FRAGMENT";
     public static final String TAG_FRIENDS_FRAGMENT = "TAG_FRIENDS_FRAGMENT";
+    public static final String TAG_PROFILE_FRAGMENT = "TAG_PROFILE_FRAGMENT";
 
     //doubles
     public double lat;
@@ -90,14 +94,23 @@ public class MainActivity extends AppCompatActivity {
 
     //ints
     public int position = 0;
+    public int mSelectedID;
 
     //Adapters
     public StaticListAdapter listAdapter;
+
+    //booleans
+
 
     //Objects
     public UserObject userObject;
     public NodeObject node;
     public NodeObject getNodes;
+
+    //Nav Drawer stuff
+    public DrawerLayout mDrawerLayout;
+    public NavigationView mNavView;
+    public ActionBarDrawerToggle drawerToggle;
 
     //List of NodeObjects
     //Give default value
@@ -109,17 +122,20 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //Setup Nav Drawer stuff
+        setViews();
+
         //Set FrameLayout
         SetFrameLayout();
 
         //Instances
         setInstances();
 
-        //Check username & set it
-        checkUsername();
-
         //Initialize View From XML
         InitializeStuff();
+
+        //Check username & set it
+        checkUsername();
 
         //Toolbar
         setToolbar();
@@ -136,15 +152,76 @@ public class MainActivity extends AppCompatActivity {
         //Logstuff
         //logDataFromVariables();
 
+        //Load Saved State
+        loadSavedState(savedInstanceState);
+
+        //Navigate to ID
+        navToID(mSelectedID);
+
+    }
+
+    private void navToID(int mSelectedID) {
+        if(mSelectedID == R.id.nav_id_map){
+            Toast.makeText(getApplicationContext(), "Map",Toast.LENGTH_SHORT).show();
+            mDrawerLayout.closeDrawer(GravityCompat.START);
+            Log.i("FragmentExample", "Item Clicked");
+            MapView fragment = new MapView();
+            fragmentManager = getFragmentManager();
+            //Replace intent with Bundle and put it in the transaction
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.replace(R.id.main_FrameLayout, fragment);
+            fragmentTransaction.commit();
+        }
+        if(mSelectedID == R.id.nav_id_tag){
+            Toast.makeText(getApplicationContext(), "Tag",Toast.LENGTH_SHORT).show();
+            mDrawerLayout.closeDrawer(GravityCompat.START);
+            Log.i("FragmentExample", "Item Clicked");
+            HashTag tag = new HashTag();
+            fragmentManager = getFragmentManager();
+            //Replace intent with Bundle and put it in the transaction
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.replace(R.id.main_FrameLayout, tag);
+            fragmentTransaction.commit();
+        }
+        if(mSelectedID == R.id.nav_id_profile){
+            Toast.makeText(getApplicationContext(), "Profile",Toast.LENGTH_SHORT).show();
+            mDrawerLayout.closeDrawer(GravityCompat.START);
+            Log.i("FragmentExample", "Item Clicked");
+            UserProfile profile = new UserProfile();
+            fragmentManager = getFragmentManager();
+            //Replace intent with Bundle and put it in the transaction
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.replace(R.id.main_FrameLayout, profile);
+            fragmentTransaction.commit();
+        }
+        if(mSelectedID == R.id.nav_id_settings){
+            Toast.makeText(getApplicationContext(), "Settings",Toast.LENGTH_SHORT).show();
+            mDrawerLayout.closeDrawer(GravityCompat.START);
+            Log.i("FragmentExample", "Item Clicked");
+            Settings settings = new Settings();
+            fragmentManager = getFragmentManager();
+            //Replace intent with Bundle and put it in the transaction
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.replace(R.id.main_FrameLayout, settings);
+            fragmentTransaction.commit();
+        }
+    }
+
+    private void loadSavedState(Bundle savedInstanceState) {
+        mSelectedID = savedInstanceState == null ?
+                R.id.nav_id_map : savedInstanceState.getInt(SELECTED_ITEM_ID);
+    }
+
+    private void setViews() {
+        nav_Header = (TextView) findViewById(R.id.nav_header_text);
     }
 
     private void SetFrameLayout() {
         mapView = new MapView();
-        fragmentManager = getSupportFragmentManager();
+        fragmentManager = getFragmentManager();
         //Replace intent with Bundle and put it in the transaction
-        fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.add(R.id.main_FrameLayout,mapView);
-        fragmentTransaction.addToBackStack(null);
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.add(R.id.main_FrameLayout, mapView);
         fragmentTransaction.commit();
     }
 
@@ -154,7 +231,6 @@ public class MainActivity extends AppCompatActivity {
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mNodeRef = mDatabase.child("nodes");
         currentUser = mUser.getUid();
-
     }
 
     private void checkUsername() {
@@ -174,7 +250,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
 
     private void setUserTitle() {
         if(getUsername.equalsIgnoreCase("")) {
@@ -209,6 +284,7 @@ public class MainActivity extends AppCompatActivity {
         }else{
             setUsername = getUsername;
             setTitle(setUsername);
+            //nav_Header.setText(setUsername);
         }
     }
 
@@ -223,6 +299,19 @@ public class MainActivity extends AppCompatActivity {
         }
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        mNavView = (NavigationView) findViewById(R.id.navigationView);
+        if(mNavView != null){
+            mNavView.setNavigationItemSelectedListener(this);
+        }
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawerToggle = new ActionBarDrawerToggle(
+                this,
+                mDrawerLayout,
+                toolbar,
+                R.string.drawer_open,
+                R.string.drawer_close);
+        mDrawerLayout.addDrawerListener(drawerToggle);
+        drawerToggle.syncState();
     }
 
     private void GenerateKey() {
@@ -401,7 +490,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-    }
+    }/*
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -436,7 +525,7 @@ public class MainActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
+    }*/
 
     private void signOut() {
         mAuth.signOut();
@@ -516,4 +605,27 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
     }
 
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        item.setChecked(true);
+
+        mSelectedID = item.getItemId();
+
+        navToID(mSelectedID);
+
+        return true;
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        drawerToggle.onConfigurationChanged(newConfig);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+        super.onSaveInstanceState(outState, outPersistentState);
+
+        outState.putInt(SELECTED_ITEM_ID, mSelectedID);
+    }
 }

@@ -8,7 +8,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
+import android.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -81,7 +82,7 @@ public class MapView extends Fragment implements OnMapReadyCallback {
     public NodeObject node;
     public NodeObject subNode;
 
-    public SupportMapFragment mapFragment;
+    public MapFragment mapFragment;
 
     public GoogleMap googleMap;
     public MarkerOptions markerOptions;
@@ -254,7 +255,7 @@ public class MapView extends Fragment implements OnMapReadyCallback {
     private void SetMap() {
         try {
             if (mapFragment == null) {
-                mapFragment = (SupportMapFragment) getFragmentManager().findFragmentById(R.id.node_maps);
+                mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.node_maps);
                 mapFragment.getMapAsync(this);
 
             }
