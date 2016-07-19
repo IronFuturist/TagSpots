@@ -234,7 +234,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if(mSelectedID == R.id.nav_id_map){
             Toast.makeText(getApplicationContext(), "Map",Toast.LENGTH_SHORT).show();
             mDrawerLayout.closeDrawer(GravityCompat.START);
-            Log.i("FragmentExample", "Item Clicked");
+            Log.i("MAPVIEW", " LOADED");
             MapView fragment = new MapView();
             fragmentManager = getFragmentManager();
             //Replace intent with Bundle and put it in the transaction
@@ -245,7 +245,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if(mSelectedID == R.id.nav_id_tag){
             Toast.makeText(getApplicationContext(), "Tag",Toast.LENGTH_SHORT).show();
             mDrawerLayout.closeDrawer(GravityCompat.START);
-            Log.i("FragmentExample", "Item Clicked");
+            Log.i("TAG", " LOADED");
             HashTag tag = new HashTag();
             fragmentManager = getFragmentManager();
             //Replace intent with Bundle and put it in the transaction
@@ -256,7 +256,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if(mSelectedID == R.id.nav_id_profile){
             Toast.makeText(getApplicationContext(), "Profile",Toast.LENGTH_SHORT).show();
             mDrawerLayout.closeDrawer(GravityCompat.START);
-            Log.i("FragmentExample", "Item Clicked");
+            Log.i("PROFILE", " LOADED");
             UserProfile profile = new UserProfile();
             fragmentManager = getFragmentManager();
             //Replace intent with Bundle and put it in the transaction
@@ -267,7 +267,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if(mSelectedID == R.id.nav_id_settings){
             Toast.makeText(getApplicationContext(), "Settings",Toast.LENGTH_SHORT).show();
             mDrawerLayout.closeDrawer(GravityCompat.START);
-            Log.i("FragmentExample", "Item Clicked");
+            Log.i("SETTINGS", " LOADED");
             Settings settings = new Settings();
             fragmentManager = getFragmentManager();
             //Replace intent with Bundle and put it in the transaction
@@ -313,7 +313,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 getUsername = (String) dataSnapshot.child("username").getValue();
                 getName = (String) dataSnapshot.child("name").getValue();
                 getMoto = (String) dataSnapshot.child("moto").getValue();
-                //setUserTitle();
+                setProfileInfo();
             }
 
             @Override
@@ -323,13 +323,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
     }
 
-    private void setUserTitle() {
+    private void setProfileInfo() {
         if(getUsername.equalsIgnoreCase("")
                 && getName.equalsIgnoreCase("")
                 && getMoto.equalsIgnoreCase("")) {
             //AlertDialog
             final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MainActivity.this);
-            dialogBuilder.setTitle("Umm...Username?");
+            dialogBuilder.setTitle("Profile Info");
             LayoutInflater inflater = MainActivity.this.getLayoutInflater();
             View dialogView = inflater.inflate(R.layout.main_add_userinfo, null);
             dialogBuilder.setView(dialogView);
@@ -339,7 +339,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     dialogView.findViewById(R.id.main_name_et);
             final EditText moto_et = (EditText)
                     dialogView.findViewById(R.id.main_moto_et);
-            dialogBuilder.setPositiveButton("Set Username", new DialogInterface.OnClickListener() {
+            dialogBuilder.setPositiveButton("Save Info", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     setUsername = username_et.getText().toString();
@@ -351,7 +351,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     mDatabase.child("users").child(mUser.getUid()).child("username").setValue(username);
                     mDatabase.child("users").child(mUser.getUid()).child("name").setValue(name);
                     mDatabase.child("users").child(mUser.getUid()).child("moto").setValue(moto);
-                    setTitle(username);
                     Toast.makeText(getApplicationContext(), "User info saved!", Toast.LENGTH_SHORT).show();
                 }
             }).
@@ -365,10 +364,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             dialogBuilder.create().show();
         }else{
-            setUsername = getUsername;
-            setTitle(setUsername);
-            //nav_Header.setText(setUsername);
+            //Log
+            Log.d(TAG, "setProfileInfo: " + "Info was previously filled.");
         }
+        Log.d(TAG, "setProfileInfo Username: " + getUsername);
+        Log.d(TAG, "setProfileInfo Name:     " + getName);
+        Log.d(TAG, "setProfileInfo Moto:     " + getMoto);
+
     }
 
     private void InitializeStuff() {

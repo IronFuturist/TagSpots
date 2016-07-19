@@ -17,44 +17,73 @@
             android:layout_height="match_parent"
             android:background="@android:color/white">
 
-            <TextView
+            <LinearLayout
+                android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="Wesley Franks"
-                android:id="@+id/profile_name"
-                android:gravity="center"
-                android:padding="15dp"
-                android:background="@color/colorDivider"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true" />
+                android:id="@+id/profile_user_titles">
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="No matter the problem there is always a solution"
-                android:id="@+id/profile_moto"
-                android:padding="10sp"
-                android:gravity="center"
-                android:textColor="@android:color/white"
-                android:background="@color/colorPrimary"
-                android:layout_below="@+id/profile_name"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="Wesley Franks"
+                    android:id="@+id/profile_user_name"
+                    android:gravity="center"
+                    android:padding="15dp"
+                    android:background="@color/colorDivider"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="Also known as"
+                    android:id="@+id/profile_user_subText"
+                    android:gravity="center"
+                    android:padding="5dp"
+                    android:textColor="@android:color/black" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="USERNAME"
+                    android:id="@+id/profile_user_username"
+                    android:textColor="@android:color/black"
+                    android:gravity="center"
+                    android:padding="5dp"
+                    android:background="@color/colorDivider" />
+
+            </LinearLayout>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:text="00"
-                android:id="@+id/profile_object_count"
+                android:id="@+id/profile_user_objectCount"
                 android:layout_centerVertical="true"
                 android:layout_centerHorizontal="true"
                 android:textColor="@color/colorPrimary"
                 android:textSize="70sp"
                 android:padding="20dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="No matter the problem there is always a solution"
+                android:id="@+id/profile_user_moto"
+                android:padding="10sp"
+                android:gravity="center"
+                android:textColor="@android:color/white"
+                android:background="@color/colorPrimary"
+                android:layout_below="@+id/profile_user_titles"
+                android:layout_centerHorizontal="true" />
+
         </RelativeLayout>
     </LinearLayout>
 </FrameLayout>
