@@ -18,9 +18,16 @@ public class FriendsActivity extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_friends, container,false);
-
+        UpdateTitle();
 
 
         return view;
+    }
+
+    private void UpdateTitle() {
+
+        //Set Title to Description
+        getActivity().setTitle("Friends");
+
     }
 }

@@ -18,7 +18,15 @@ public class HashTag extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_tag,container,false);
+        UpdateTitle();
 
         return view;
+    }
+
+    private void UpdateTitle() {
+
+        //Set Title to Description
+        getActivity().setTitle("Tags");
+
     }
 }

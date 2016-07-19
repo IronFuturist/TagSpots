@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private static final String FIRST_TIME = "first_time";
 
     //TAG STRING
-    public static String TAG = MainActivity.class.getSimpleName();
+    public static final String TAG = MainActivity.class.getSimpleName();
 
 
     //Views
@@ -82,6 +82,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public String currentUser;
     public String getUsername;
     public String setUsername;
+    public String getName;
+    public String setName;
+    public String getMoto;
+    public String setMoto;
     public String keys;
     public static final String TAG_MAPVIEW_FRAGMENT = "TAG_MAPVIEW_FRAGMENT";
     public static final String TAG_HASHTAG_FRAGMENT = "TAG_HASHTAG_FRAGMENT";
@@ -113,6 +117,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public NavigationView mNavView;
     public ActionBarDrawerToggle drawerToggle;
 
+    //toolbar
+    public Toolbar toolbar;
+
     //List of NodeObjects
     //Give default value
     public List<NodeObject> nodesList = new ArrayList<>();
@@ -122,18 +129,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        //Shared Preferences
-        setSharedPreferenceDrawer();
-
-        //Check if user has seen drawer
-        didUserSeeDrawer();
-
-        //Setup Nav Drawer stuff
-        setViews();
-
-        //Set FrameLayout
-        SetFrameLayout();
 
         //Instances
         setInstances();
@@ -147,6 +142,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //Toolbar
         setToolbar();
 
+        //Setup Nav Drawer stuff
+        setViews();
+
+        //Set FrameLayout
+        SetFrameLayout();
+
         //Generate key for nodes
         //GenerateKey();
 
@@ -159,33 +160,74 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //Logstuff
         //logDataFromVariables();
 
+        //NavDrawer Setup
+        mNavView = (NavigationView) findViewById(R.id.navigationView);
+        if(mNavView != null){
+            mNavView.setNavigationItemSelectedListener(this);
+        }
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawerToggle = new ActionBarDrawerToggle(
+                this,
+                mDrawerLayout,
+                toolbar,
+                R.string.drawer_open,
+                R.string.drawer_close);
+        mDrawerLayout.addDrawerListener(drawerToggle);
+        drawerToggle.syncState();
+
         //Load Saved State
         loadSavedState(savedInstanceState);
 
         //Navigate to ID
         navToID(mSelectedID);
 
+        Log.d(TAG, "User Saw Drawer: " + mUserSawDrawer);
+        //Did user see drawer?
+        // use thread for performance
+        Thread t = new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+
+                SharedPreferences sp = getSharedPreferences("yoursharedprefs", 0);
+                mUserSawDrawer = sp.getBoolean("key", true);
+                // we will not get a value  at first start, so true will be returned
+
+                // if it was the first app start
+                if(mUserSawDrawer) {
+                    openDrawer();
+                    SharedPreferences.Editor e = sp.edit();
+                    // we save the value "false", indicating that it is no longer the first appstart
+                    e.putBoolean("key", false);
+                    e.apply();
+                }
+            }
+        });
+
+        t.start();
     }
 
-    private void didUserSeeDrawer() {
-        if(!setSharedPreferenceDrawer()){
-            openDrawer();
-            markDrawerAsShown();
-        }
-        else {
-            closeDrawer();
-        }
-    }
-
-    private boolean setSharedPreferenceDrawer() {
+    private boolean drawerPreference() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        sharedPreferences.getBoolean(FIRST_TIME, false);
+        sharedPreferences.getBoolean(FIRST_TIME,true);
         return mUserSawDrawer;
     }
     private void markDrawerAsShown(){
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mUserSawDrawer = true;
-        sharedPreferences.edit().putBoolean(FIRST_TIME,mUserSawDrawer).apply();
+        sharedPreferences.edit().putBoolean(FIRST_TIME,false).apply();
+        Log.d(TAG, "markDrawerAsShown: " + mUserSawDrawer);
+    }
+
+
+    public void openDrawer(){
+        mDrawerLayout.openDrawer(GravityCompat.START);
+        Log.d(TAG, "Drawer was OPENED ");
+    }
+
+    public void closeDrawer(){
+        mDrawerLayout.closeDrawer(GravityCompat.START);
+        Log.d(TAG, "Drawer was CLOSED ");
     }
 
     private void navToID(int mSelectedID) {
@@ -269,7 +311,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 Log.i(TAG, "USER KEY : " + dataSnapshot.getKey());
                 Log.i(TAG, "USER INFO: " + dataSnapshot.child("username").getValue());
                 getUsername = (String) dataSnapshot.child("username").getValue();
-                setUserTitle();
+                getName = (String) dataSnapshot.child("name").getValue();
+                getMoto = (String) dataSnapshot.child("moto").getValue();
+                //setUserTitle();
             }
 
             @Override
@@ -280,24 +324,35 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void setUserTitle() {
-        if(getUsername.equalsIgnoreCase("")) {
+        if(getUsername.equalsIgnoreCase("")
+                && getName.equalsIgnoreCase("")
+                && getMoto.equalsIgnoreCase("")) {
             //AlertDialog
             final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MainActivity.this);
             dialogBuilder.setTitle("Umm...Username?");
             LayoutInflater inflater = MainActivity.this.getLayoutInflater();
-            View dialogView = inflater.inflate(R.layout.main_add_username, null);
+            View dialogView = inflater.inflate(R.layout.main_add_userinfo, null);
             dialogBuilder.setView(dialogView);
-            final EditText editText = (EditText)
+            final EditText username_et = (EditText)
                     dialogView.findViewById(R.id.main_username_et);
+            final EditText name_et = (EditText)
+                    dialogView.findViewById(R.id.main_name_et);
+            final EditText moto_et = (EditText)
+                    dialogView.findViewById(R.id.main_moto_et);
             dialogBuilder.setPositiveButton("Set Username", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    setUsername = editText.getText().toString();
+                    setUsername = username_et.getText().toString();
+                    setName = name_et.getText().toString();
+                    setMoto = moto_et.getText().toString();
                     String username = setUsername;
+                    String name = setName;
+                    String moto = setMoto;
                     mDatabase.child("users").child(mUser.getUid()).child("username").setValue(username);
+                    mDatabase.child("users").child(mUser.getUid()).child("name").setValue(name);
+                    mDatabase.child("users").child(mUser.getUid()).child("moto").setValue(moto);
                     setTitle(username);
-                    Toast.makeText(getApplicationContext(), "Username: " + username + " assigned!"
-                            , Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "User info saved!", Toast.LENGTH_SHORT).show();
                 }
             }).
                     setNegativeButton("Or Not...", new DialogInterface.OnClickListener() {
@@ -325,21 +380,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        mNavView = (NavigationView) findViewById(R.id.navigationView);
-        if(mNavView != null){
-            mNavView.setNavigationItemSelectedListener(this);
-        }
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawerToggle = new ActionBarDrawerToggle(
-                this,
-                mDrawerLayout,
-                toolbar,
-                R.string.drawer_open,
-                R.string.drawer_close);
-        mDrawerLayout.addDrawerListener(drawerToggle);
-        drawerToggle.syncState();
     }
 
     private void GenerateKey() {
@@ -631,6 +673,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onPause() {
         super.onPause();
+
     }
 
     @Override
@@ -641,15 +684,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         navToID(mSelectedID);
 
+        Log.d(TAG, "onNavigationItemSelected: " + mSelectedID);
+
         return true;
-    }
-
-    public void openDrawer(){
-        mDrawerLayout.openDrawer(GravityCompat.START);
-    }
-
-    public void closeDrawer(){
-        mDrawerLayout.closeDrawer(GravityCompat.START);
     }
 
     @Override

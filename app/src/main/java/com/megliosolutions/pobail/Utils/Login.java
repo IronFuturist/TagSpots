@@ -54,6 +54,8 @@ public class Login extends BaseActivity {
     public String mUsername;
     public String mEmail;
     public String mPassword;
+    public String mName;
+    public String mMoto;
 
     // [START declare_auth_listener]
     private FirebaseAuth.AuthStateListener mAuthListener;
@@ -111,12 +113,16 @@ public class Login extends BaseActivity {
                                 mEmail = mEmailField.getText().toString();
                                 mPassword = mPasswordField.getText().toString();
                                 mUsername = "";
+                                mName = "";
+                                mMoto = "";
 
                                 //Make User Object
-                                UserObject uo = new UserObject(mEmail,mUsername,mPassword);
+                                UserObject uo = new UserObject(mEmail,mUsername,mPassword,mName,mMoto);
                                 uo.setEmail(mEmail);
                                 uo.setUsername(mUsername);
                                 uo.setPassword(mPassword);
+                                uo.setName(mName);
+                                uo.setMoto(mMoto);
                                 //Add user to database for authentication access
                                 mDatabase.child("users").child(user.getUid()).setValue(uo);
 

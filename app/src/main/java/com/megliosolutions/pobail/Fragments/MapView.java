@@ -115,7 +115,7 @@ public class MapView extends Fragment implements OnMapReadyCallback {
         //ConvertToMGRS();
 
         //ChangeTitle
-        //UpdateTitle();
+        UpdateTitle();
 
         //Log Data
         logDataFromVariables();
@@ -267,7 +267,7 @@ public class MapView extends Fragment implements OnMapReadyCallback {
     private void UpdateTitle() {
 
         //Set Title to Description
-        getActivity().setTitle("I shouldn't be here...");
+        getActivity().setTitle("Map");
 
     }
 
