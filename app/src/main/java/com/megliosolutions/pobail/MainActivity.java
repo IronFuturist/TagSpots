@@ -232,7 +232,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void navToID(int mSelectedID) {
         if(mSelectedID == R.id.nav_id_map){
-            Toast.makeText(getApplicationContext(), "Map",Toast.LENGTH_SHORT).show();
             mDrawerLayout.closeDrawer(GravityCompat.START);
             Log.i("MAPVIEW", " LOADED");
             MapView fragment = new MapView();
@@ -243,7 +242,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             fragmentTransaction.commit();
         }
         if(mSelectedID == R.id.nav_id_tag){
-            Toast.makeText(getApplicationContext(), "Tag",Toast.LENGTH_SHORT).show();
             mDrawerLayout.closeDrawer(GravityCompat.START);
             Log.i("TAG", " LOADED");
             HashTag tag = new HashTag();
@@ -254,7 +252,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             fragmentTransaction.commit();
         }
         if(mSelectedID == R.id.nav_id_profile){
-            Toast.makeText(getApplicationContext(), "Profile",Toast.LENGTH_SHORT).show();
             mDrawerLayout.closeDrawer(GravityCompat.START);
             Log.i("PROFILE", " LOADED");
             UserProfile profile = new UserProfile();
@@ -265,7 +262,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             fragmentTransaction.commit();
         }
         if(mSelectedID == R.id.nav_id_settings){
-            Toast.makeText(getApplicationContext(), "Settings",Toast.LENGTH_SHORT).show();
             mDrawerLayout.closeDrawer(GravityCompat.START);
             Log.i("SETTINGS", " LOADED");
             Settings settings = new Settings();

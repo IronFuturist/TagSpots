@@ -68,9 +68,7 @@ public class UserProfile extends Fragment {
                     Log.i(TAG, "USER INFO-ERROR: " + databaseError.getMessage());
                 }
             });
-
     }
-
     private void updateUserInfo() {
         //Set info from savedPreferences
         setName = getName;

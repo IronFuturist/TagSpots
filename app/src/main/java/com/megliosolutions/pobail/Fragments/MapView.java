@@ -2,13 +2,18 @@ package com.megliosolutions.pobail.Fragments;
 
 
 import android.Manifest;
+import android.annotation.TargetApi;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -21,6 +26,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMapOptions;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -43,20 +49,11 @@ import com.megliosolutions.pobail.Utils.Login;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 
 public class MapView extends Fragment implements OnMapReadyCallback {
 
     public static final String TAG = MapView.class.getSimpleName();
-
-    public TextView staticAddress_TV;
-    public TextView description_TV;
-    public TextView latitude_TV;
-
-    public String staticAddress;
-    public String description;
-    public double latitude;
-    public double longitude;
-    public int position;
 
     public String static_ip;
     public String desc;
@@ -90,6 +87,10 @@ public class MapView extends Fragment implements OnMapReadyCallback {
 
     public View view;
 
+    public String[] requestPermissionsStrings;
+    public int[] requestGrantResults;
+    public static final int requestPermissionCode = 101;
+
     //Main Activity
     MainActivity mainActivity;
 
@@ -97,16 +98,10 @@ public class MapView extends Fragment implements OnMapReadyCallback {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_mapview, container, false);
-
-        //Gather data from itemclick
-        //gatherData();
+        this.getChildFragmentManager();
 
         //Set Instances
         setInstances();
-
-        //Bring over list
-        bringNodes();
-        //bringSubNodes();
 
         //SetMap
         SetMap();
@@ -154,76 +149,7 @@ public class MapView extends Fragment implements OnMapReadyCallback {
 
     }
 
-    private void bringNodes() {
-        ChildEventListener childEventListener = new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                NodeObject nodeMarkers = dataSnapshot.getValue(NodeObject.class);
-                nodeObjectArrayList.add(nodeMarkers);
-
-                Log.i(TAG, "Nodes: ----> " + nodeObjectArrayList.size());
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-
-        };
-        mNodeRef.addChildEventListener(childEventListener);
-    }
-
-    private void bringSubNodes() {
-        ChildEventListener subNodesListener = new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                subNode = dataSnapshot.getValue(NodeObject.class);
-                Log.i(TAG, "SELECTED KEY: " + selectedKey);
-                subNodeArrayList.add(subNode);
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        };
-        Log.i(TAG, "bringSubNodes-SelectedKey: " + mDatabase.child(childNode).child(selectedKey).getKey());
-        mSubNodeRef.addChildEventListener(subNodesListener);
-    }
-
     private void populateMarkers() {
-        //Hash map
-        nodeMarkerHashMap = new HashMap<Marker, NodeObject>();
 
         Log.i(TAG, "POPULATE DATA NODES: ----> " + nodeObjectArrayList.size());
         Log.i(TAG, "POPULATE SUB NODES: -----> " + subNodeArrayList.size());
@@ -255,7 +181,7 @@ public class MapView extends Fragment implements OnMapReadyCallback {
     private void SetMap() {
         try {
             if (mapFragment == null) {
-                mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.node_maps);
+                mapFragment = (MapFragment) this.getChildFragmentManager().findFragmentById(R.id.node_maps);
                 mapFragment.getMapAsync(this);
 
             }
@@ -271,23 +197,53 @@ public class MapView extends Fragment implements OnMapReadyCallback {
 
     }
 
-    private void gatherData() {
-        //Populate node
-        Intent intent = getActivity().getIntent();
-        staticAddress = intent.getStringExtra("staticIP");
-        description = intent.getStringExtra("description");
-        latitude = intent.getDoubleExtra("lat", 0.0);
-        longitude = intent.getDoubleExtra("long", 0.0);
-        selectedKey = intent.getStringExtra("key");
-        Log.i(TAG, "gatherData-SelectedKey: " + selectedKey);
-    }
 
+    /*@Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (requestCode == requestPermissionCode) {
+            if (permissions.length == 1 &&
+                    permissions[0].equalsIgnoreCase(Manifest.permission.ACCESS_FINE_LOCATION) &&
+                    grantResults[0] == PackageManager.PERMISSION_GRANTED &&
+                    ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
+                    == PackageManager.PERMISSION_GRANTED) {
+
+                    googleMap.setMyLocationEnabled(true);
+                    mapFragment.getMapAsync(this);
+
+            } else {
+                // Permission was denied. Display an error message.
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if(shouldShowRequestPermissionRationale(Manifest.permission_group.LOCATION))
+                    permissionDeniedToast();
+                }
+                Log.d(TAG, "onRequestPermissionsResult: PermissionDenied");
+
+            }
+        }
+    }*/
+
+    public void permissionDeniedToast(){
+        Toast.makeText(getActivity(),"Location permissions are needed to use the app.",Toast.LENGTH_SHORT).show();
+    }
 
     @Override
     public void onMapReady(GoogleMap map) {
         googleMap = map;
+
         googleMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
-        googleMap.isMyLocationEnabled();
+        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            googleMap.setMyLocationEnabled(true);
+
+
+        } else {
+            // Show rationale and request permission.
+            permissionDeniedToast();
+            ActivityCompat.requestPermissions(getActivity(),
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    requestPermissionCode);
+        }
+
     }
 
     private void addNode() {
@@ -346,16 +302,6 @@ public class MapView extends Fragment implements OnMapReadyCallback {
         dialogBuilder.create().show();
     }
 
-    private void signOut() {
-        mAuth.signOut();
-        Intent intent = new Intent(getActivity(), Login.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        Toast.makeText(getActivity(), "Logging Out.", Toast.LENGTH_SHORT).show();
-        startActivity(intent);
-
-    }
-
     @Override
     public void onStart() {
         super.onStart();
@@ -376,7 +322,6 @@ public class MapView extends Fragment implements OnMapReadyCallback {
     @Override
     public void onPause() {
         super.onPause();
-
     }
 }
 
