@@ -39,7 +39,7 @@ import com.megliosolutions.pobail.Fragments.HashTag;
 import com.megliosolutions.pobail.Fragments.MapView;
 import com.megliosolutions.pobail.Fragments.Settings;
 import com.megliosolutions.pobail.Fragments.UserProfile;
-import com.megliosolutions.pobail.Objects.NodeObject;
+import com.megliosolutions.pobail.Objects.TagObject;
 import com.megliosolutions.pobail.Objects.UserObject;
 import com.megliosolutions.pobail.Utils.Login;
 
@@ -109,8 +109,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     //Objects
     public UserObject userObject;
-    public NodeObject node;
-    public NodeObject getNodes;
+    public TagObject tag;
 
     //Nav Drawer stuff
     public DrawerLayout mDrawerLayout;
@@ -119,10 +118,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     //toolbar
     public Toolbar toolbar;
-
-    //List of NodeObjects
-    //Give default value
-    public List<NodeObject> nodesList = new ArrayList<>();
 
 
     @Override
@@ -399,273 +394,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     }
 
-    private void SetAdapter() {
-        //ListAdapter stuff
-        listAdapter = new StaticListAdapter(getApplicationContext(),nodesList);
-
-        //ListView stuff
-        if(nodesList==null){
-            Log.e(TAG, "NODESLIST IS NULL");
-        }else{
-            //listAdapter.sort();
-            main_ListView.setAdapter(listAdapter);
-        }
-
-
-    }
-
-    private void setClickListeners() {
-
-        //Set OnItemClick Listener
-        //When clicked, it will go to a single view of the node
-        //populating it's data
-        main_ListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //Go to MapView Fragment
-                /*SavedMapView = (MapView) getSupportFragmentManager()
-                        .findFragmentByTag(TAG_MAPVIEW_FRAGMENT);
-                if(SavedMapView == null){
-                    mapView = new MapView();
-                   *//* NodeObject pos = listAdapter.mNodes.get(position);
-                    bundle = new Bundle();
-                    bundle.putString("staticIP",pos.getStaticAddress());
-                    bundle.putString("description",pos.getDescription());
-                    bundle.putDouble("lat",pos.getLatitude());
-                    bundle.putDouble("long",pos.getLongitude());
-                    bundle.putString("key", pos.getKey());
-                    mapView.setArguments(bundle);*//*
-                    fragmentManager = getSupportFragmentManager();
-                    //Replace intent with Bundle and put it in the transaction
-                    fragmentTransaction = fragmentManager.beginTransaction();
-                    fragmentTransaction.add(R.id.fragment_view_mapview,mapView);
-                    fragmentTransaction.addToBackStack(null);
-                    fragmentTransaction.commit();*/
-
-
-
-
-                //Bring Data with
-            }
-        });
-
-        //Set OnItemLong Click Listener
-        //Delete Node when long pressed
-        //Show dialog to give user a choice
-        main_ListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
-
-                final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MainActivity.this);
-                dialogBuilder.setTitle("Please Don't Kill Me!");
-                dialogBuilder.setPositiveButton("Kill Me...", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        //Delete node
-                        Log.d(TAG, "NUM of NODES: " + listAdapter.mNodes.size());
-                        NodeObject pos = listAdapter.mNodes.get(position);
-                        Log.i(TAG, "Generated Key: " + mKey);
-                        String selectedKey = listAdapter.mNodes.get(position).getKey();
-                        Log.i(TAG, "Selected Key: " + selectedKey);
-                        mNodeRef.child(selectedKey).removeValue();
-                        listAdapter.mNodes.remove(pos);
-                        listAdapter.notifyDataSetChanged();
-                        main_ListView.setAdapter(listAdapter);
-                        Toast.makeText(getApplicationContext(), "Node has been murdered terribly."
-                                , Toast.LENGTH_SHORT).show();
-                    }
-                }).
-                        setNegativeButton("Don't Kill Me!", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                Toast.makeText(getApplicationContext(), "Fine, ya coward."
-                                        , Toast.LENGTH_SHORT).show();
-                            }
-                        });
-
-                dialogBuilder.create().show();
-                /*
-                Toast.makeText(getApplicationContext(),"Item at: " + position,Toast.LENGTH_SHORT).show();
-                Toast.makeText(getApplicationContext(), ""  +listAdapter.mNodes.size(), Toast.LENGTH_SHORT).show();*/
-
-
-                return true;
-            }
-        });
-
-    }
-
-    private void retrieveMoreData() {
-
-       mDatabase.child("nodes").addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                Log.d(TAG, "onChildAdded:" + dataSnapshot.getKey());
-                getNodes = dataSnapshot.getValue(NodeObject.class);
-
-
-                keys = dataSnapshot.getKey();
-
-                Log.i(TAG, "HERE ARE THE KEYS BITCHES: " + keys);
-
-
-                listAdapter.add(getNodes);
-                listAdapter.notifyDataSetChanged();
-                listAdapter.setNotifyOnChange(true);
-
-                Log.i(TAG, "Num Of Nodes: " + listAdapter.mNodes.size());
-
-                Log.i(TAG, "Node Strings: " + listAdapter.mNodes.get(0).getKey());
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                Log.d(TAG, "onChildChanged:" + dataSnapshot.getKey());
-
-                listAdapter.notifyDataSetChanged();
-                listAdapter.setNotifyOnChange(true);
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-                String removedKey = dataSnapshot.getKey();
-                Log.d(TAG, "onChildRemoved:" + dataSnapshot.getKey());
-
-                //For Loop to cycle through listview adapter array to get the right key
-                //Then get that position, and remove it from the list.
-                String removeNode;
-                String getKey;
-                for(int i=0; i<listAdapter.getCount();i++){
-                    NodeObject nodeItem = listAdapter.getItem(i);
-                    removeNode = nodeItem.getKey();
-                    Log.i(TAG, "NODE TO REMOVE: " + removeNode);
-                }
-
-                //listAdapter.mNodes.remove();
-                listAdapter.notifyDataSetChanged();
-                listAdapter.setNotifyOnChange(true);
-                main_ListView.setAdapter(listAdapter);
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-                Log.d(TAG, "onChildMoved:" + dataSnapshot.getKey());
-                listAdapter.setNotifyOnChange(true);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-    }/*
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
-        switch (item.getItemId()) {
-            case R.id.refresh:
-               //nothing
-                listAdapter.mNodes.clear();
-                listAdapter.notifyDataSetChanged();
-                retrieveMoreData();
-                Toast.makeText(getApplicationContext(), "Refreshed."
-                        , Toast.LENGTH_SHORT).show();
-                listAdapter.mNodes.size();
-                Toast.makeText(getApplicationContext(), "Nodes: " + listAdapter.mNodes.size()
-                        , Toast.LENGTH_SHORT).show();
-                return true;
-            case R.id.addNode:
-                addNode();
-                return true;
-            case R.id.logout:
-                signOut();
-                return true;
-
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }*/
-
-    private void signOut() {
-        mAuth.signOut();
-        Intent intent = new Intent(MainActivity.this, Login.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        Toast.makeText(getApplicationContext(), "Logging Out.", Toast.LENGTH_SHORT).show();
-        startActivity(intent);
-
-    }
-
-    private void addNode() {
-        //Get generated key set it to the node
-        GenerateKey();
-        Log.i(TAG, "ADD NODE GENERATED KEY: " + mKey);
-
-        //AlertDialog
-        final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-
-        dialogBuilder.setTitle("Dude, assign something...");
-
-        LayoutInflater inflater = this.getLayoutInflater();
-
-        View dialogView = inflater.inflate(R.layout.main_add_node_dialog, null);
-
-        dialogBuilder.setView(dialogView);
-
-        final EditText editText = (EditText)
-                dialogView.findViewById(R.id.static_et);
-        final EditText editText1 = (EditText)
-                dialogView.findViewById(R.id.lat_et);
-        final EditText editText2 = (EditText)
-                dialogView.findViewById(R.id.long_et);
-        final EditText editText3 = (EditText)
-                dialogView.findViewById(R.id.desc_et);
-        dialogBuilder.setPositiveButton("Assign", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                static_ip = editText.getText().toString();
-                desc = editText3.getText().toString();
-                String tempLat = editText1.getText().toString();
-                String tempLong = editText2.getText().toString();
-                lat = Double.parseDouble(tempLat);
-                mLong = Double.parseDouble(tempLong);
-                node = new NodeObject(static_ip,desc,lat,mLong,mKey);
-                mDatabase.child("nodes").child(mKey).setValue(node);
-                Toast.makeText(getApplicationContext(), "Node: \n" + "Child Key:   " + mKey + "\n" +
-                                                                     "StaticIP:    " + static_ip + "\n" +
-                                                                     "Description: " + desc + "\n" +
-                                                                     "Latitude:    " + lat + "\n" +
-                                                                     "Longitude:   " + mLong
-                        , Toast.LENGTH_SHORT).show();
-            }
-        }).
-                setNegativeButton("Or Not...", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(getApplicationContext(), "Fine, nvm then..."
-                                , Toast.LENGTH_SHORT).show();
-                    }
-                });
-
-        dialogBuilder.create().show();
-    }
     @Override
     protected void onResume() {
         super.onResume();
-        //listAdapter.clear();
-        //retrieveMoreData();
-        //Log.i(TAG, "Node Size: " + listAdapter.mNodes.size() +"");
-        //listAdapter.notifyDataSetChanged();
-        //main_ListView.setAdapter(listAdapter);
     }
 
     @Override

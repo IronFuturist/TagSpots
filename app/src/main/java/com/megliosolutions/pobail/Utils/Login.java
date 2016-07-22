@@ -90,7 +90,7 @@ public class Login extends BaseActivity {
 
                 signIn(mEmailField.getText().toString(),mPasswordField.getText().toString());
 
-
+                hideProgressDialog();
             }
         });
 
@@ -136,9 +136,6 @@ public class Login extends BaseActivity {
                                 // [END_EXCLUDE]
                             }else{
                                 Log.i(TAG, "AuthStateListener-DataExists-ELSE: " + !dataSnapshot.exists());
-                                Toast.makeText(Login.this, "Logging in...",
-                                        Toast.LENGTH_SHORT).show();
-
                                 Intent intent = new Intent(Login.this,MainActivity.class);
                                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);

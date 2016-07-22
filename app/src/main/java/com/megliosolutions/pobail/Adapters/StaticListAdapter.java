@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.megliosolutions.pobail.Objects.NodeObject;
+import com.megliosolutions.pobail.Objects.TagObject;
 import com.megliosolutions.pobail.R;
 
 import java.util.List;
@@ -15,10 +15,13 @@ import java.util.List;
 /**
  * Created by Meglio on 6/14/16.
  */
-public class StaticListAdapter extends ArrayAdapter<NodeObject> {
-    public static String TAG = StaticListAdapter.class.getSimpleName();
+public class StaticListAdapter extends ArrayAdapter<TagObject> {
+    public StaticListAdapter(Context context, int resource, TagObject[] objects) {
+        super(context, resource, objects);
+    }
+    /*public static String TAG = StaticListAdapter.class.getSimpleName();
     public Context mContext;
-    public List<NodeObject> mNodes;
+    public List<TagObject> mNodes;
 
     //Viewholder
 
@@ -29,7 +32,7 @@ public class StaticListAdapter extends ArrayAdapter<NodeObject> {
     }
 
     @Override
-    public int getPosition(NodeObject item) {
+    public int getPosition(TagObject item) {
         return super.getPosition(item);
     }
 
@@ -38,7 +41,7 @@ public class StaticListAdapter extends ArrayAdapter<NodeObject> {
         return mNodes.size();
     }
 
-    public StaticListAdapter(Context context, List<NodeObject> objects) {
+    public StaticListAdapter(Context context, List<TagObject> objects) {
         super(context, R.layout.activity_main, objects);
         this.mContext = context;
         this.mNodes = objects;
@@ -46,7 +49,7 @@ public class StaticListAdapter extends ArrayAdapter<NodeObject> {
 
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder = new ViewHolder();
-        NodeObject node = mNodes.get(position);
+        TagObject node = mNodes.get(position);
         if (convertView == null) {
             convertView = LayoutInflater.from(this.mContext).inflate(R.layout.node_header, null);
             holder.mStaticAddress = (TextView) convertView.findViewById(R.id.node_item_IP);
@@ -59,5 +62,5 @@ public class StaticListAdapter extends ArrayAdapter<NodeObject> {
         holder.mDescription.setText(node.getDescription());
 
         return convertView;
-    }
+    }*/
 }

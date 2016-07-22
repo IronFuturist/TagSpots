@@ -2,11 +2,9 @@ package com.megliosolutions.pobail.Fragments;
 
 
 import android.Manifest;
-import android.annotation.TargetApi;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -15,23 +13,16 @@ import android.support.v4.app.ActivityCompat;
 import android.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.GoogleMapOptions;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -42,14 +33,11 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.megliosolutions.pobail.MainActivity;
-import com.megliosolutions.pobail.Objects.NodeObject;
+import com.megliosolutions.pobail.Objects.TagObject;
+import com.megliosolutions.pobail.Objects.TagProperty;
 import com.megliosolutions.pobail.R;
-import com.megliosolutions.pobail.Utils.Login;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Set;
 
 public class MapView extends Fragment implements OnMapReadyCallback {
 
@@ -61,124 +49,57 @@ public class MapView extends Fragment implements OnMapReadyCallback {
     public double mLong;
     public String mKey;
     public String selectedKey;
-    public String childNode = "nodes";
-    public String childSubNode = "subnodes";
-
+    public String childTag = "tags";
+    public String childTagProperty = "tagproperty";
+    public String tag_title;
+    public String permissions;
     public String currentUser;
     public String keys;
+    public String title;
 
     public DatabaseReference mDatabase;
-    public DatabaseReference mNodeRef;
-    public DatabaseReference mSubNodeRef;
+    public DatabaseReference mTag;
     public FirebaseAuth mAuth;
     public FirebaseUser mUser;
 
-    public ArrayList<NodeObject> nodeObjectArrayList = new ArrayList<>();
-    public ArrayList<MarkerOptions> nodeMarkersList = new ArrayList<>();
-    public ArrayList<NodeObject> subNodeArrayList = new ArrayList<>();
-    public NodeObject node;
-    public NodeObject subNode;
+    public ArrayList<TagObject> tagObjectArrayList = new ArrayList<>();
+    public ArrayList<TagObject> tagPropertyArray = new ArrayList<>();
+    public TagObject tag;
+    public TagProperty tagProperty;
 
     public MapFragment mapFragment;
 
     public GoogleMap googleMap;
     public MarkerOptions markerOptions;
-    public HashMap<Marker, NodeObject> nodeMarkerHashMap;
 
     public View view;
 
-    public String[] requestPermissionsStrings;
-    public int[] requestGrantResults;
+    public String[] requestPermissionsStrings = {Manifest.permission_group.LOCATION};
+    public int PERMISSION_GRANTED = 1;
+    public int PERMISSION_DENIED = 0;
+    public int[] requestGrantResults = {PERMISSION_DENIED, PERMISSION_GRANTED};
     public static final int requestPermissionCode = 101;
 
-    //Main Activity
-    MainActivity mainActivity;
+    public ProgressDialog myProgress;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_mapview, container, false);
         this.getChildFragmentManager();
-
-        //Set Instances
-        setInstances();
-
-        //SetMap
-        SetMap();
-
-        //Convert LatLong to MGRS
-        //ConvertToMGRS();
+        Log.d(TAG, "onCreateView: After View created TAGS = " + tagObjectArrayList.size());
 
         //ChangeTitle
         UpdateTitle();
+        Log.d(TAG, "onCreateView: After Title Updated created TAGS = " + tagObjectArrayList.size());
 
-        //Log Data
-        logDataFromVariables();
+        //Set Instances
+        setInstances();
+        Log.d(TAG, "onCreateView: After Views Initialized created TAGS = " + tagObjectArrayList.size());
 
-        return view;
-    }
-
-    private void logDataFromVariables() {
-        //Log some stuff
-        Log.i(TAG, "USER: " + currentUser);
-
-    }
-
-    private void setInstances() {
-        mAuth = FirebaseAuth.getInstance();
-        mUser = mAuth.getCurrentUser();
-        mDatabase = FirebaseDatabase.getInstance().getReference();
-        mNodeRef = mDatabase.child(childNode);
-        //mSubNodeRef = mDatabase.child(childNode).child(selectedKey).child(childSubNode);
-        Log.i(TAG, "SetInstances-SelectedKey: " + selectedKey);
-        currentUser = mUser.getUid();
-    }
-
-    private void GenerateKey() {
-        mKey = mSubNodeRef.push().getKey();
-        if (mKey.equalsIgnoreCase(mKey)) {
-            mKey = mSubNodeRef.push().getKey();
-            Log.i(TAG, "NEW SUBNODE CHILD KEY: " + mKey);
-        }
-
-        Log.i(TAG, "SUBNODE CHILD KEY: " + mKey);
-    }
-
-    private void ConvertToMGRS() {
-        //Convert Coordinates
-
-    }
-
-    private void populateMarkers() {
-
-        Log.i(TAG, "POPULATE DATA NODES: ----> " + nodeObjectArrayList.size());
-        Log.i(TAG, "POPULATE SUB NODES: -----> " + subNodeArrayList.size());
-
-        // Add ten cluster items in close proximity, for purposes of this example.
-        for (int i = 0; i < nodeObjectArrayList.size(); i++) {
-            double lat = nodeObjectArrayList.get(i).getLatitude();
-            //Log.i(TAG, "POPULATE DATA NODES: LAT----> " + nodeObjectArrayList.get(i).getLatitude());
-            double lng = nodeObjectArrayList.get(i).getLongitude();
-            //Log.i(TAG, "POPULATE DATA NODES: LNG----> " + nodeObjectArrayList.get(i).getLongitude());
-            String ip = nodeObjectArrayList.get(i).getStaticAddress();
-            //Log.i(TAG, "POPULATE DATA NODES: TITLE----> " + nodeObjectArrayList.get(i).getStaticAddress());
-            String desc = nodeObjectArrayList.get(i).getDescription();
-            //Log.i(TAG, "POPULATE DATA NODES: SNIPPIT----> " + nodeObjectArrayList.get(i).getDescription());
-            int icon = R.drawable.ic_wifi_tethering_white_48dp;
-            //Log.i(TAG, "POPULATE DATA NODES: Node " + i);
-
-            markerOptions = new MarkerOptions()
-                    .position(new LatLng(lat, lng))
-                    .title(ip)
-                    .snippet(desc)
-                    .icon(BitmapDescriptorFactory.fromResource(icon));
-
-            googleMap.addMarker(markerOptions);
-        }
-
-    }
-
-    private void SetMap() {
+        pullTags();
+        Log.d(TAG, "onCreateView: After Tags pulled from Firebase = " + tagObjectArrayList.size());
+        //SetMap
         try {
             if (mapFragment == null) {
                 mapFragment = (MapFragment) this.getChildFragmentManager().findFragmentById(R.id.node_maps);
@@ -187,125 +108,226 @@ public class MapView extends Fragment implements OnMapReadyCallback {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            Log.d(TAG, "onCreateView: CATCH EXCEPTION");
         }
+        Log.d(TAG, "onCreateView: After MapFragment has been loaded = " + tagObjectArrayList.size());
+
+        //Convert LatLong to MGRS
+        //ConvertToMGRS();
+
+        //Log Data
+        logDataFromVariables();
+
+        return view;
+    }
+
+    private void pullTags() {
+        ChildEventListener childEventListener = new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                TagObject mTag = dataSnapshot.getValue(TagObject.class);
+
+                tagObjectArrayList.add(mTag);
+                Log.d(TAG, "onChildAdded: " + tagObjectArrayList.size());
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                tag = dataSnapshot.getValue(TagObject.class);
+
+                tagObjectArrayList.add(tag);
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                /*tag = dataSnapshot.getValue(TagObject.class);
+
+                tagObjectArrayList.remove(tag);*/
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                tag = dataSnapshot.getValue(TagObject.class);
+
+                tagObjectArrayList.add(tag);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.d(TAG, "onCancelled: ");
+            }
+        };
+        mTag.child(mUser.getUid()).addChildEventListener(childEventListener);
+    }
+
+
+    private void logDataFromVariables() {
+        //Log some stuff
+        Log.i(TAG, "USER: " + currentUser);
+        Log.d(TAG, "logDataFromVariables: tagArraySize = " + tagObjectArrayList.size());
+
+    }
+
+    private void setInstances() {
+        mAuth = FirebaseAuth.getInstance();
+        mUser = mAuth.getCurrentUser();
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        mTag = mDatabase.child(childTag);
+        //mTagProperty = mDatabase.child(childTag).child(selectedKey).child(childTagProperty);
+        Log.i(TAG, "SetInstances-SelectedKey: " + selectedKey);
+        currentUser = mUser.getUid();
+    }
+
+    private void GenerateKey() {
+        mKey = mDatabase.push().getKey();
+        if (mKey.equalsIgnoreCase(mKey)) {
+            mKey = mDatabase.push().getKey();
+            Log.i(TAG, "NEW TAG CHILD KEY: " + mKey);
+        }
+
+        Log.i(TAG, "TAGPROPERTY CHILD KEY: " + mKey);
+    }
+
+    private void ConvertToMGRS() {
+        //Convert Coordinates
+
     }
 
     private void UpdateTitle() {
-
         //Set Title to Description
         getActivity().setTitle("Map");
-
     }
 
 
-    /*@Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        if (requestCode == requestPermissionCode) {
-            if (permissions.length == 1 &&
-                    permissions[0].equalsIgnoreCase(Manifest.permission.ACCESS_FINE_LOCATION) &&
-                    grantResults[0] == PackageManager.PERMISSION_GRANTED &&
-                    ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
-                    == PackageManager.PERMISSION_GRANTED) {
+    public void permissionDeniedToast() {
+        Toast.makeText(getActivity(), "Location permissions were denied. Accept, and then restart the app.", Toast.LENGTH_SHORT).show();
+    }
 
-                    googleMap.setMyLocationEnabled(true);
-                    mapFragment.getMapAsync(this);
-
-            } else {
-                // Permission was denied. Display an error message.
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    if(shouldShowRequestPermissionRationale(Manifest.permission_group.LOCATION))
-                    permissionDeniedToast();
-                }
-                Log.d(TAG, "onRequestPermissionsResult: PermissionDenied");
-
-            }
-        }
-    }*/
-
-    public void permissionDeniedToast(){
-        Toast.makeText(getActivity(),"Location permissions are needed to use the app.",Toast.LENGTH_SHORT).show();
+    public void permissionRationaleToast() {
+        Toast.makeText(getActivity(), "Location permissions are needed to use the features of this app.", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onMapReady(GoogleMap map) {
+        tagObjectArrayList.size();
         googleMap = map;
-
+        setUpMap(googleMap);
         googleMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
         if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             googleMap.setMyLocationEnabled(true);
-
-
+            googleMap.getUiSettings().setMapToolbarEnabled(true);
+            googleMap.getUiSettings().setZoomControlsEnabled(true);
         } else {
             // Show rationale and request permission.
             permissionDeniedToast();
-            ActivityCompat.requestPermissions(getActivity(),
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    requestPermissionCode);
+
         }
+
+        // Add ten cluster items in close proximity, for purposes of this example.
+        Log.d(TAG, "onMapReady: " + tagObjectArrayList.size());
+        /*
+        */
+        googleMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
+            @Override
+            public void onMapLoaded() {
+                for (int i = 0; i < tagObjectArrayList.size(); i++) {
+                    double lat = tagObjectArrayList.get(i).getLat();
+                    double lng = tagObjectArrayList.get(i).getLng();
+                    String title = tagObjectArrayList.get(i).getTitle();
+
+                    markerOptions = new MarkerOptions()
+                            .position(new LatLng(lat, lng))
+                            .title(title);
+
+                    googleMap.addMarker(markerOptions);
+                }
+            }
+        });
+        Log.d(TAG, "populateMarkers: ADDED MARKERS");
 
     }
 
-    private void addNode() {
-        //Get generated key set it to the node
-        GenerateKey();
-        Log.i(TAG, "ADD NODE GENERATED KEY: " + mKey);
-
-        //AlertDialog
-        final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity());
-
-        dialogBuilder.setTitle("Dude, assign something...");
-
-        LayoutInflater inflater = getActivity().getLayoutInflater();
-
-        View dialogView = inflater.inflate(R.layout.main_add_node_dialog, null);
-
-        dialogBuilder.setView(dialogView);
-
-        final EditText editText = (EditText)
-                dialogView.findViewById(R.id.static_et);
-        final EditText editText1 = (EditText)
-                dialogView.findViewById(R.id.lat_et);
-        final EditText editText2 = (EditText)
-                dialogView.findViewById(R.id.long_et);
-        final EditText editText3 = (EditText)
-                dialogView.findViewById(R.id.desc_et);
-        dialogBuilder.setPositiveButton("Assign", new DialogInterface.OnClickListener() {
+    public void setUpMap(GoogleMap map) {
+        this.googleMap = map;
+        googleMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
-                static_ip = editText.getText().toString();
-                desc = editText3.getText().toString();
-                String tempLat = editText1.getText().toString();
-                String tempLong = editText2.getText().toString();
-                lat = Double.parseDouble(tempLat);
-                mLong = Double.parseDouble(tempLong);
-                node = new NodeObject(static_ip,desc,lat,mLong,mKey);
-                mSubNodeRef.push().setValue(node);
-                Toast.makeText(getActivity(),
-                        "Sub-Node: \n" +
-                                "Child Key:   " + mKey + "\n" +
-                                "StaticIP:    " + static_ip + "\n" +
-                                "Description: " + desc + "\n" +
-                                "Latitude:    " + lat + "\n" +
-                                "Longitude:   " + mLong
-                        , Toast.LENGTH_SHORT).show();
+            public void onMapLoaded() {
+                Log.d(TAG, "onMapLoaded: CALLBACK LOADED");
+                //progressBarStop();
             }
-        }).
-                setNegativeButton("Or Not...", new DialogInterface.OnClickListener() {
+        });
+        googleMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+            @Override
+            public void onMapLongClick(final LatLng latLng) {
+                GenerateKey();
+                //set a marker
+                //AlertDialog
+                lat = latLng.latitude;
+                mLong = latLng.longitude;
+                final AlertDialog.Builder tagBuilder = new AlertDialog.Builder(getActivity());
+                tagBuilder.setTitle("Tag");
+                LayoutInflater inflater = getActivity().getLayoutInflater();
+                View dialogView = inflater.inflate(R.layout.tag_new_dialog, null);
+                tagBuilder.setView(dialogView);
+                final EditText title_et = (EditText)
+                        dialogView.findViewById(R.id.tag_et_title);
+                tagBuilder.setPositiveButton("Save Tag", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(getActivity(), "Fine, nvm then..."
+                        tag_title = title_et.getText().toString();
+                        title = tag_title;
+                        permissions = "";
+                        TagObject mTag = new TagObject(title, lat, mLong, mKey,permissions);
+                        mDatabase.child("tags").child(mUser.getUid()).child(mKey).setValue(mTag);
+                        Toast.makeText(getActivity(), "Tag Added!"
                                 , Toast.LENGTH_SHORT).show();
+                        //now add the marker after it is saved.
+                        googleMap.addMarker(new MarkerOptions()
+                                .position(new LatLng(lat,mLong))
+                                .title(title));
                     }
-                });
+                }).
+                        setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Toast.makeText(getActivity(), "Cool, maybe later."
+                                        , Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                tagBuilder.create().show();
+                // Once the dialog is dismissed add the marker with the info saved.
 
-        dialogBuilder.create().show();
+
+            }
+        });
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (requestCode == requestPermissionCode) {
+            if (permissions.length == 1 &&
+                    permissions[0] == Manifest.permission.ACCESS_FINE_LOCATION &&
+                    grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (ActivityCompat.checkSelfPermission(getActivity(),
+                        Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(getActivity(),
+                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                            requestPermissionCode);
+                    return;
+                }
+                googleMap.setMyLocationEnabled(true);
+            } else {
+                // Permission was denied. Display an error message.
+                permissionDeniedToast();
+            }
+        }
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        SetMap();
     }
 
     @Override
@@ -316,7 +338,7 @@ public class MapView extends Fragment implements OnMapReadyCallback {
     @Override
     public void onResume() {
         super.onResume();
-        SetMap();
+        googleMap = mapFragment.getMap();
     }
 
     @Override
