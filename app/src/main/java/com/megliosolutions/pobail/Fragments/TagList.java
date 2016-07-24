@@ -1,8 +1,12 @@
 package com.megliosolutions.pobail.Fragments;
 
+import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +23,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.megliosolutions.pobail.Adapters.TagListAdapter;
+import com.megliosolutions.pobail.MainActivity;
 import com.megliosolutions.pobail.Objects.TagObject;
 import com.megliosolutions.pobail.R;
 
@@ -52,7 +57,19 @@ public class TagList extends Fragment {
         tag_listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
+                TagObject tag = tagObjectArrayList.get(position);
+                //Go to fragment
+                Settings settings = new Settings();
+                FragmentManager fragmentManager = getFragmentManager();
+                //Replace intent with Bundle and put it in the transaction
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.main_FrameLayout, settings);
+                fragmentTransaction.commit();
+                getActivity().setTitle("Tag Properties");
+                AppCompatActivity activity = new AppCompatActivity();
+                if (activity.getSupportActionBar() != null) {
+                    activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                }
             }
         });
 
