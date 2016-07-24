@@ -10,9 +10,12 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,6 +26,7 @@ import android.widget.Toast;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -37,7 +41,10 @@ import com.megliosolutions.pobail.Objects.TagObject;
 import com.megliosolutions.pobail.Objects.TagProperty;
 import com.megliosolutions.pobail.R;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 public class MapView extends Fragment implements OnMapReadyCallback {
 
@@ -56,6 +63,7 @@ public class MapView extends Fragment implements OnMapReadyCallback {
     public String currentUser;
     public String keys;
     public String title;
+    public String created;
 
     public DatabaseReference mDatabase;
     public DatabaseReference mTag;
@@ -67,12 +75,10 @@ public class MapView extends Fragment implements OnMapReadyCallback {
     public TagObject tag;
     public TagProperty tagProperty;
 
-    public MapFragment mapFragment;
+    public SupportMapFragment mapFragment;
 
     public GoogleMap googleMap;
     public MarkerOptions markerOptions;
-
-    public View view;
 
     public String[] requestPermissionsStrings = {Manifest.permission_group.LOCATION};
     public int PERMISSION_GRANTED = 1;
@@ -82,10 +88,24 @@ public class MapView extends Fragment implements OnMapReadyCallback {
 
     public ProgressDialog myProgress;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        if (ContextCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+
+        } else {
+            // Show rationale and request permission.
+            permissionRationaleToast();
+
+        }
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_mapview, container, false);
+        View view = inflater.inflate(R.layout.fragment_mapview, container, false);
         this.getChildFragmentManager();
         Log.d(TAG, "onCreateView: After View created TAGS = " + tagObjectArrayList.size());
 
@@ -102,7 +122,7 @@ public class MapView extends Fragment implements OnMapReadyCallback {
         //SetMap
         try {
             if (mapFragment == null) {
-                mapFragment = (MapFragment) this.getChildFragmentManager().findFragmentById(R.id.node_maps);
+                mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.node_maps);
                 mapFragment.getMapAsync(this);
 
             }
@@ -248,6 +268,15 @@ public class MapView extends Fragment implements OnMapReadyCallback {
 
     }
 
+    public void tagCreated(){
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy", Locale.ENGLISH);
+        SimpleDateFormat timeFormat = new SimpleDateFormat("h:m:s a z", Locale.ENGLISH);
+        String date = dateFormat.format(new Date());
+        String time = timeFormat.format(new Date());
+        created = String.format("%s - %s",date,time);
+        Log.d(TAG, "tagCreated: " + created);
+    }
+
     public void setUpMap(GoogleMap map) {
         this.googleMap = map;
         googleMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
@@ -278,7 +307,9 @@ public class MapView extends Fragment implements OnMapReadyCallback {
                         tag_title = title_et.getText().toString();
                         title = tag_title;
                         permissions = "";
-                        TagObject mTag = new TagObject(title, lat, mLong, mKey,permissions);
+                        created = "";
+                        tagCreated();
+                        TagObject mTag = new TagObject(title, lat, mLong, mKey,permissions,created);
                         mDatabase.child("tags").child(mUser.getUid()).child(mKey).setValue(mTag);
                         Toast.makeText(getActivity(), "Tag Added!"
                                 , Toast.LENGTH_SHORT).show();
@@ -312,9 +343,7 @@ public class MapView extends Fragment implements OnMapReadyCallback {
                     grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 if (ActivityCompat.checkSelfPermission(getActivity(),
                         Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(getActivity(),
-                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                            requestPermissionCode);
+
                     return;
                 }
                 googleMap.setMyLocationEnabled(true);

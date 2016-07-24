@@ -16,16 +16,22 @@ public class TagObject {
     public double lng;
     public String key;
     public String permission;
+    public String created;
 
     public TagObject() {
     }
 
-    public TagObject(String tag_title, double lat, double lng, String key, String permission) {
+    public TagObject(String tag_title, double lat, double lng, String key, String permission, String created) {
         this.tag_title = tag_title;
         this.lat = lat;
         this.lng = lng;
         this.key = key;
         this.permission = permission;
+        this.created = created;
+    }
+
+    public String getCreated() {
+        return created;
     }
 
     public String getTag_title() {
@@ -46,6 +52,10 @@ public class TagObject {
 
     public String getPermission() {
         return permission;
+    }
+
+    public void setCreated(String created){
+        this.created = created;
     }
 
     public void setTag_title(String tag_title) {

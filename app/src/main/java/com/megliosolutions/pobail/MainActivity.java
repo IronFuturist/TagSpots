@@ -1,14 +1,12 @@
 package com.megliosolutions.pobail;
 
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.os.PersistableBundle;
-import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -20,7 +18,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -28,24 +25,15 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-import com.megliosolutions.pobail.Adapters.StaticListAdapter;
+import com.megliosolutions.pobail.Adapters.TagListAdapter;
 import com.megliosolutions.pobail.Fragments.HashTag;
 import com.megliosolutions.pobail.Fragments.MapView;
 import com.megliosolutions.pobail.Fragments.ProfileViewPager;
 import com.megliosolutions.pobail.Fragments.Settings;
-import com.megliosolutions.pobail.Fragments.UserProfile;
 import com.megliosolutions.pobail.Objects.TagObject;
 import com.megliosolutions.pobail.Objects.UserObject;
-import com.megliosolutions.pobail.Utils.Login;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -103,7 +91,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public int mSelectedID;
 
     //Adapters
-    public StaticListAdapter listAdapter;
+    public TagListAdapter listAdapter;
 
     //booleans
     public boolean mUserSawDrawer = false;
@@ -126,14 +114,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+
         //Instances
         setInstances();
 
         //Initialize View From XML
         InitializeStuff();
-
-        //Check username & set it
-        checkUsername();
 
         //Toolbar
         setToolbar();
@@ -146,12 +133,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         //Generate key for nodes
         //GenerateKey();
-
-        //Set Adapter
-        //SetAdapter();
-
-        //Set ClickListeners
-        //setClickListeners();
 
         //Logstuff
         //logDataFromVariables();
@@ -218,41 +199,45 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             mDrawerLayout.closeDrawer(GravityCompat.START);
             Log.i("MAPVIEW", " LOADED");
             MapView fragment = new MapView();
-            fragmentManager = getFragmentManager();
+            fragmentManager = getSupportFragmentManager();
             //Replace intent with Bundle and put it in the transaction
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.replace(R.id.main_FrameLayout, fragment);
             fragmentTransaction.commit();
+            setTitle("Map");
         }
         if(mSelectedID == R.id.nav_id_tag){
             mDrawerLayout.closeDrawer(GravityCompat.START);
             Log.i("TAG", " LOADED");
             HashTag tag = new HashTag();
-            fragmentManager = getFragmentManager();
+            fragmentManager = getSupportFragmentManager();
             //Replace intent with Bundle and put it in the transaction
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.replace(R.id.main_FrameLayout, tag);
             fragmentTransaction.commit();
+            setTitle("Tags");
         }
         if(mSelectedID == R.id.nav_id_profile){
             mDrawerLayout.closeDrawer(GravityCompat.START);
             Log.i("PROFILE", " LOADED");
             ProfileViewPager profile = new ProfileViewPager();
-            fragmentManager = getFragmentManager();
+            fragmentManager = getSupportFragmentManager();
             //Replace intent with Bundle and put it in the transaction
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.replace(R.id.main_FrameLayout, profile);
             fragmentTransaction.commit();
+            setTitle("Pobail");
         }
         if(mSelectedID == R.id.nav_id_settings){
             mDrawerLayout.closeDrawer(GravityCompat.START);
             Log.i("SETTINGS", " LOADED");
             Settings settings = new Settings();
-            fragmentManager = getFragmentManager();
+            fragmentManager = getSupportFragmentManager();
             //Replace intent with Bundle and put it in the transaction
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.replace(R.id.main_FrameLayout, settings);
             fragmentTransaction.commit();
+            setTitle("Settings");
         }
     }
 
@@ -267,10 +252,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void SetFrameLayout() {
         mapView = new MapView();
-        fragmentManager = getFragmentManager();
+        fragmentManager = getSupportFragmentManager();
         //Replace intent with Bundle and put it in the transaction
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.add(R.id.main_FrameLayout, mapView);
+        fragmentTransaction.add(R.id.main_FrameLayout, mapView,TAG_MAPVIEW_FRAGMENT);
         fragmentTransaction.commit();
     }
 
@@ -280,26 +265,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mNodeRef = mDatabase.child("nodes");
         currentUser = mUser.getUid();
-    }
-
-    private void checkUsername() {
-
-        mDatabase.child("users").child(mUser.getUid()).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Log.i(TAG, "USER KEY : " + dataSnapshot.getKey());
-                Log.i(TAG, "USER INFO: " + dataSnapshot.child("username").getValue());
-                getUsername = (String) dataSnapshot.child("username").getValue();
-                getName = (String) dataSnapshot.child("name").getValue();
-                getMoto = (String) dataSnapshot.child("moto").getValue();
-                setProfileInfo();
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.i(TAG, "USER INFO-ERROR: " + databaseError.getMessage());
-            }
-        });
     }
 
     private void setProfileInfo() {

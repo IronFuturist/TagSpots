@@ -15,19 +15,19 @@ import java.util.List;
 /**
  * Created by Meglio on 6/14/16.
  */
-public class StaticListAdapter extends ArrayAdapter<TagObject> {
-    public StaticListAdapter(Context context, int resource, TagObject[] objects) {
+public class TagListAdapter extends ArrayAdapter<TagObject> {
+    public TagListAdapter(Context context, int resource, TagObject[] objects) {
         super(context, resource, objects);
     }
-    /*public static String TAG = StaticListAdapter.class.getSimpleName();
+    public static String TAG = TagListAdapter.class.getSimpleName();
     public Context mContext;
-    public List<TagObject> mNodes;
+    public List<TagObject> mTagsList;
 
     //Viewholder
 
     public class ViewHolder {
-        TextView mStaticAddress;
-        TextView mDescription;
+        TextView mTagTitle;
+        TextView mCreated;
 
     }
 
@@ -38,29 +38,29 @@ public class StaticListAdapter extends ArrayAdapter<TagObject> {
 
     @Override
     public int getCount() {
-        return mNodes.size();
+        return mTagsList.size();
     }
 
-    public StaticListAdapter(Context context, List<TagObject> objects) {
+    public TagListAdapter(Context context, List<TagObject> objects) {
         super(context, R.layout.activity_main, objects);
         this.mContext = context;
-        this.mNodes = objects;
+        this.mTagsList = objects;
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder = new ViewHolder();
-        TagObject node = mNodes.get(position);
+        TagObject mTag = mTagsList.get(position);
         if (convertView == null) {
-            convertView = LayoutInflater.from(this.mContext).inflate(R.layout.node_header, null);
-            holder.mStaticAddress = (TextView) convertView.findViewById(R.id.node_item_IP);
-            holder.mDescription = (TextView) convertView.findViewById(R.id.node_item_desc);
+            convertView = LayoutInflater.from(this.mContext).inflate(R.layout.tag_list_item, null);
+            holder.mTagTitle = (TextView) convertView.findViewById(R.id.tag_item_title);
+            holder.mCreated = (TextView) convertView.findViewById(R.id.tag_item_created);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
-        holder.mStaticAddress.setText(node.getStaticAddress());
-        holder.mDescription.setText(node.getDescription());
+        holder.mTagTitle.setText(mTag.getTag_title());
+        holder.mCreated.setText(mTag.getCreated());
 
         return convertView;
-    }*/
+    }
 }
