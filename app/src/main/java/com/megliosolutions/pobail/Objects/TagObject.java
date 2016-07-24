@@ -11,9 +11,7 @@ import com.google.firebase.database.FirebaseDatabase;
  */
 public class TagObject {
 
-
-    public String title;
-    public String tag;
+    public String tag_title;
     public double lat;
     public double lng;
     public String key;
@@ -22,20 +20,16 @@ public class TagObject {
     public TagObject() {
     }
 
-    public TagObject(String title, double lat, double lng, String key, String permission) {
-        this.title = title;
+    public TagObject(String tag_title, double lat, double lng, String key, String permission) {
+        this.tag_title = tag_title;
         this.lat = lat;
         this.lng = lng;
         this.key = key;
         this.permission = permission;
     }
 
-    public String getPermission() {
-        return permission;
-    }
-
-    public String getTitle() {
-        return title;
+    public String getTag_title() {
+        return tag_title;
     }
 
     public double getLat() {
@@ -50,8 +44,12 @@ public class TagObject {
         return key;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public String getPermission() {
+        return permission;
+    }
+
+    public void setTag_title(String tag_title) {
+        this.tag_title = tag_title;
     }
 
     public void setLat(double lat) {

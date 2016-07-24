@@ -3,6 +3,9 @@ package com.megliosolutions.pobail.Fragments;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TabLayout;
+import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,18 +48,25 @@ public class UserProfile extends Fragment {
     private ArrayList<TagObject> profile_count = new ArrayList<>();
     private String showTagCount;
     private int tagNum;
+    public ViewPager userViewPager;
+    public TabLayout tabLayout;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_userprofile,container,false);
         setInstances(view);
+        setUpTabBar();
         getUserInfo();
         getTagCount();
         UpdateTitle();
         updateUserInfo();
 
         return view;
+    }
+
+    private void setUpTabBar() {
+
     }
 
     private int getTagCount() {

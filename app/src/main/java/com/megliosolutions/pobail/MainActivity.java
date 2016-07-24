@@ -37,6 +37,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.megliosolutions.pobail.Adapters.StaticListAdapter;
 import com.megliosolutions.pobail.Fragments.HashTag;
 import com.megliosolutions.pobail.Fragments.MapView;
+import com.megliosolutions.pobail.Fragments.ProfileViewPager;
 import com.megliosolutions.pobail.Fragments.Settings;
 import com.megliosolutions.pobail.Fragments.UserProfile;
 import com.megliosolutions.pobail.Objects.TagObject;
@@ -202,19 +203,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         t.start();
     }
 
-    private boolean drawerPreference() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        sharedPreferences.getBoolean(FIRST_TIME,true);
-        return mUserSawDrawer;
-    }
-    private void markDrawerAsShown(){
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        mUserSawDrawer = true;
-        sharedPreferences.edit().putBoolean(FIRST_TIME,false).apply();
-        Log.d(TAG, "markDrawerAsShown: " + mUserSawDrawer);
-    }
-
-
     public void openDrawer(){
         mDrawerLayout.openDrawer(GravityCompat.START);
         Log.d(TAG, "Drawer was OPENED ");
@@ -249,7 +237,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if(mSelectedID == R.id.nav_id_profile){
             mDrawerLayout.closeDrawer(GravityCompat.START);
             Log.i("PROFILE", " LOADED");
-            UserProfile profile = new UserProfile();
+            ProfileViewPager profile = new ProfileViewPager();
             fragmentManager = getFragmentManager();
             //Replace intent with Bundle and put it in the transaction
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -375,23 +363,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-    }
-
-    private void GenerateKey() {
-        mKey = mNodeRef.push().getKey();
-        Log.i(TAG, "NODE CHILD KEY: " + mKey);
-        if(mKey.equalsIgnoreCase(mKey)){
-            mKey = mNodeRef.push().getKey();
-            Log.i(TAG, "NEW NODE CHILD KEY: " + mKey);
-        }
-    }
-
-    private void logDataFromVariables() {
-        //Log some stuff
-        Log.i(TAG, "USER: " + currentUser);
-        //Log Keys
-        Log.i(TAG, "WHERE ARE THE KEYS BITCHES: " + keys);
-
     }
 
     @Override

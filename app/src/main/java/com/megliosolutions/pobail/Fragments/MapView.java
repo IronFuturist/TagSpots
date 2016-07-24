@@ -234,7 +234,7 @@ public class MapView extends Fragment implements OnMapReadyCallback {
                 for (int i = 0; i < tagObjectArrayList.size(); i++) {
                     double lat = tagObjectArrayList.get(i).getLat();
                     double lng = tagObjectArrayList.get(i).getLng();
-                    String title = tagObjectArrayList.get(i).getTitle();
+                    String title = tagObjectArrayList.get(i).getTag_title();
 
                     markerOptions = new MarkerOptions()
                             .position(new LatLng(lat, lng))
