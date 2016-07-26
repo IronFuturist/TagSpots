@@ -27,6 +27,7 @@ public class TagPropertyList extends Fragment {
     public String key;
     public String value;
 
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -34,6 +35,8 @@ public class TagPropertyList extends Fragment {
         initializeStuff(view);
 
         SetupFloatingButton(view);
+
+        getActivity().onBackPressed();
 
         return view;
     }
@@ -43,8 +46,9 @@ public class TagPropertyList extends Fragment {
         mActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                key = "Key";
+                value = "Value";
                 propertyList.add(new TagProperty(key,value));
-                
             }
         });
     }
@@ -52,7 +56,10 @@ public class TagPropertyList extends Fragment {
     private void initializeStuff(View view) {
         mActionButton = (FloatingActionButton)view.findViewById(R.id.tag_property_floatingAction);
         mTagList = (ListView) view.findViewById(R.id.tag_list);
+
     }
+
+
 
 
 }

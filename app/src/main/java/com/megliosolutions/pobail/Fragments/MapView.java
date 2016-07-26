@@ -304,19 +304,24 @@ public class MapView extends Fragment implements OnMapReadyCallback {
                 tagBuilder.setPositiveButton("Save Tag", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        tag_title = title_et.getText().toString();
-                        title = tag_title;
-                        permissions = "";
-                        created = "";
-                        tagCreated();
-                        TagObject mTag = new TagObject(title, lat, mLong, mKey,permissions,created);
-                        mDatabase.child("tags").child(mUser.getUid()).child(mKey).setValue(mTag);
-                        Toast.makeText(getActivity(), "Tag Added!"
-                                , Toast.LENGTH_SHORT).show();
-                        //now add the marker after it is saved.
-                        googleMap.addMarker(new MarkerOptions()
-                                .position(new LatLng(lat,mLong))
-                                .title(title));
+                        if(title_et.getText().toString().isEmpty()){
+                            Toast.makeText(getActivity(), "Tag empty, please add a tag."
+                                    , Toast.LENGTH_SHORT).show();
+                        }else{
+                            tag_title = title_et.getText().toString();
+                            title = tag_title;
+                            permissions = "";
+                            created = "";
+                            tagCreated();
+                            TagObject mTag = new TagObject(title, lat, mLong, mKey,permissions,created);
+                            mDatabase.child("tags").child(mUser.getUid()).child(mKey).setValue(mTag);
+                            Toast.makeText(getActivity(), "Tag Added!"
+                                    , Toast.LENGTH_SHORT).show();
+                            //now add the marker after it is saved.
+                            googleMap.addMarker(new MarkerOptions()
+                                    .position(new LatLng(lat,mLong))
+                                    .title(title));
+                        }
                     }
                 }).
                         setNegativeButton("Cancel", new DialogInterface.OnClickListener() {

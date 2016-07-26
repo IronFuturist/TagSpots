@@ -57,13 +57,13 @@ public class TagList extends Fragment {
         tag_listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                TagObject tag = tagObjectArrayList.get(position);
+                //TagObject tag = tagObjectArrayList.get(position);
                 //Go to fragment
-                Settings settings = new Settings();
+                TagPropertyList tagPropertyList = new TagPropertyList();
                 FragmentManager fragmentManager = getFragmentManager();
                 //Replace intent with Bundle and put it in the transaction
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.main_FrameLayout, settings);
+                fragmentTransaction.replace(R.id.main_FrameLayout, tagPropertyList);
                 fragmentTransaction.commit();
                 getActivity().setTitle("Tag Properties");
                 AppCompatActivity activity = new AppCompatActivity();
