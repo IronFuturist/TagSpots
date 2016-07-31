@@ -8,7 +8,7 @@
         android:layout_height="wrap_content"
         android:inputType="textPersonName"
         android:ems="10"
-        android:id="@+id/editText"
+        android:id="@+id/tagedit_title"
         android:hint="Title" />
 
     <EditText
@@ -16,19 +16,25 @@
         android:layout_height="wrap_content"
         android:inputType="textPersonName"
         android:ems="10"
-        android:id="@+id/editText2"
+        android:id="@+id/tagedit_category"
         android:hint="Category" />
 
     <TextView
         android:text="Created "
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/textView"
+        android:id="@+id/tagedit_created"
         android:textSize="18sp"
         android:padding="8dp" />
 
+    <Spinner
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/tagedit_permissions_spinner"
+        android:layout_gravity="center_horizontal" />
+
     <Button
-        android:text="Save"
+        android:text="Save Tag"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/tagedit_button_save" />

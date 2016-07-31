@@ -15,6 +15,12 @@
     <string name="nav_str_tag">TAG</string>
 
 
+    <string-array name="tagEdit_Permissions">
+        <item>Public</item>
+        <item>Friends</item>
+        <item>Private</item>
+    </string-array>
+
 
     <string name="label_google_sign_in">Firebase + Google Sign In</string>
     <string name="desc_google_sign_in">Use a Google Sign In credential to authenticate with Firebase.</string>

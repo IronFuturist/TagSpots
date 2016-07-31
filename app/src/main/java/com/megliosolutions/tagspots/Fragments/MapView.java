@@ -258,6 +258,7 @@ public class MapView extends Fragment implements OnMapReadyCallback, GoogleApiCl
                 Bundle bundle = new Bundle();
                 //Create title in TagEdit
                 bundle.putString("created", created);
+                bundle.putString("key", mKey);
                 bundle.putDouble("lat", lat);
                 bundle.putDouble("long", mLong);
                 //Select permission in Tagedit
@@ -287,16 +288,19 @@ public class MapView extends Fragment implements OnMapReadyCallback, GoogleApiCl
     @Override
     public void onDestroy() {
         super.onDestroy();
+        mGoogleApiClient.disconnect();
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        mGoogleApiClient.connect();
     }
 
     @Override
     public void onPause() {
         super.onPause();
+        mGoogleApiClient.disconnect();
     }
 
 

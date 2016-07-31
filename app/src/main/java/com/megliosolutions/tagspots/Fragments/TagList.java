@@ -120,14 +120,20 @@ public class TagList extends Fragment {
 
     private void setUpListview() {
         //ListView stuff
-        if(tagObjectArrayList.size()>0){
-            listAdapter = new TagListAdapter(getContext(),tagObjectArrayList);
-            tag_listView.setAdapter(listAdapter);
-            listAdapter.notifyDataSetChanged();
+        if(tagObjectArrayList.isEmpty() && tagObjectArrayList==null){
+            Log.d(TAG, "setUpListview: LIST IS EMPTY");
         }
-        else {
-            Toast.makeText(getActivity(),"No Tags",Toast.LENGTH_SHORT).show();
+        else{
+            if(tagObjectArrayList.size()>0){
+                listAdapter = new TagListAdapter(getContext(),tagObjectArrayList);
+                tag_listView.setAdapter(listAdapter);
+                listAdapter.notifyDataSetChanged();
+            }
+            else {
+                Log.d(TAG, "setUpListview: List is empty");
+            }
         }
+
     }
 
 
