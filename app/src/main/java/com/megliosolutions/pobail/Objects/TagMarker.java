@@ -5,7 +5,7 @@ import com.google.android.gms.maps.model.LatLng;
 /**
  * Created by Meglio on 6/27/16.
  */
-public class NodeMarker {
+public class TagMarker {
 
     public Double mLat;
     public Double mLong;
@@ -13,7 +13,7 @@ public class NodeMarker {
     public String mSnippet;
     public int mIcon;
 
-    public NodeMarker(Double mLat, Double mLong, String mTitle, String mSnippet, int mIcon) {
+    public TagMarker(Double mLat, Double mLong, String mTitle, String mSnippet, int mIcon) {
         this.mLat = mLat;
         this.mLong = mLong;
         this.mTitle = mTitle;

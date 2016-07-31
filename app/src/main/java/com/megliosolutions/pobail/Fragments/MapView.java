@@ -2,10 +2,8 @@ package com.megliosolutions.pobail.Fragments;
 
 
 import android.Manifest;
-import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.pm.PackageManager;
-import android.os.Build;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -14,21 +12,21 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
-import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -38,7 +36,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.megliosolutions.pobail.Objects.TagObject;
-import com.megliosolutions.pobail.Objects.TagProperty;
 import com.megliosolutions.pobail.R;
 
 import java.text.SimpleDateFormat;
@@ -46,24 +43,22 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
-public class MapView extends Fragment implements OnMapReadyCallback {
+public class MapView extends Fragment implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     public static final String TAG = MapView.class.getSimpleName();
 
-    public String static_ip;
-    public String desc;
+
+    public double user_lat;
+    public double user_long;
     public double lat;
     public double mLong;
     public String mKey;
     public String selectedKey;
     public String childTag = "tags";
-    public String childTagProperty = "tagproperty";
-    public String tag_title;
-    public String permissions;
     public String currentUser;
-    public String keys;
     public String title;
     public String created;
+
 
     public DatabaseReference mDatabase;
     public DatabaseReference mTag;
@@ -71,34 +66,25 @@ public class MapView extends Fragment implements OnMapReadyCallback {
     public FirebaseUser mUser;
 
     public ArrayList<TagObject> tagObjectArrayList = new ArrayList<>();
-    public ArrayList<TagObject> tagPropertyArray = new ArrayList<>();
     public TagObject tag;
-    public TagProperty tagProperty;
 
     public SupportMapFragment mapFragment;
 
     public GoogleMap googleMap;
     public MarkerOptions markerOptions;
 
-    public String[] requestPermissionsStrings = {Manifest.permission_group.LOCATION};
-    public int PERMISSION_GRANTED = 1;
-    public int PERMISSION_DENIED = 0;
-    public int[] requestGrantResults = {PERMISSION_DENIED, PERMISSION_GRANTED};
-    public static final int requestPermissionCode = 101;
+    public GoogleApiClient mGoogleApiClient;
 
-    public ProgressDialog myProgress;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        if (ContextCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
-
-        } else {
-            // Show rationale and request permission.
-            permissionRationaleToast();
-
+        if (mGoogleApiClient == null) {
+            mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .build();
         }
     }
 
@@ -106,40 +92,27 @@ public class MapView extends Fragment implements OnMapReadyCallback {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_mapview, container, false);
-        this.getChildFragmentManager();
-        Log.d(TAG, "onCreateView: After View created TAGS = " + tagObjectArrayList.size());
 
         //ChangeTitle
         UpdateTitle();
-        Log.d(TAG, "onCreateView: After Title Updated created TAGS = " + tagObjectArrayList.size());
 
         //Set Instances
         setInstances();
-        Log.d(TAG, "onCreateView: After Views Initialized created TAGS = " + tagObjectArrayList.size());
 
         pullTags();
-        Log.d(TAG, "onCreateView: After Tags pulled from Firebase = " + tagObjectArrayList.size());
         //SetMap
         try {
             if (mapFragment == null) {
                 mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.node_maps);
                 mapFragment.getMapAsync(this);
-
             }
         } catch (Exception e) {
             e.printStackTrace();
             Log.d(TAG, "onCreateView: CATCH EXCEPTION");
         }
-        Log.d(TAG, "onCreateView: After MapFragment has been loaded = " + tagObjectArrayList.size());
-
-        //Convert LatLong to MGRS
-        //ConvertToMGRS();
-
-        //Log Data
-        logDataFromVariables();
-
         return view;
     }
+
 
     private void pullTags() {
         ChildEventListener childEventListener = new ChildEventListener() {
@@ -180,14 +153,6 @@ public class MapView extends Fragment implements OnMapReadyCallback {
         mTag.child(mUser.getUid()).addChildEventListener(childEventListener);
     }
 
-
-    private void logDataFromVariables() {
-        //Log some stuff
-        Log.i(TAG, "USER: " + currentUser);
-        Log.d(TAG, "logDataFromVariables: tagArraySize = " + tagObjectArrayList.size());
-
-    }
-
     private void setInstances() {
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
@@ -208,23 +173,9 @@ public class MapView extends Fragment implements OnMapReadyCallback {
         Log.i(TAG, "TAGPROPERTY CHILD KEY: " + mKey);
     }
 
-    private void ConvertToMGRS() {
-        //Convert Coordinates
-
-    }
-
     private void UpdateTitle() {
         //Set Title to Description
         getActivity().setTitle("Map");
-    }
-
-
-    public void permissionDeniedToast() {
-        Toast.makeText(getActivity(), "Location permissions were denied. Accept, and then restart the app.", Toast.LENGTH_SHORT).show();
-    }
-
-    public void permissionRationaleToast() {
-        Toast.makeText(getActivity(), "Location permissions are needed to use the features of this app.", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -239,11 +190,10 @@ public class MapView extends Fragment implements OnMapReadyCallback {
             googleMap.getUiSettings().setMapToolbarEnabled(true);
             googleMap.getUiSettings().setZoomControlsEnabled(true);
         } else {
-            // Show rationale and request permission.
-            permissionDeniedToast();
-
+            googleMap.setMyLocationEnabled(false);
+            googleMap.getUiSettings().setMapToolbarEnabled(false);
+            googleMap.getUiSettings().setZoomControlsEnabled(false);
         }
-
         // Add ten cluster items in close proximity, for purposes of this example.
         Log.d(TAG, "onMapReady: " + tagObjectArrayList.size());
         /*
@@ -261,6 +211,13 @@ public class MapView extends Fragment implements OnMapReadyCallback {
                             .title(title);
 
                     googleMap.addMarker(markerOptions);
+
+                    LatLng me = new LatLng(user_lat,user_long);
+
+                    googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(me,18));
+
+                    mGoogleApiClient.disconnect();
+
                 }
             }
         });
@@ -268,20 +225,22 @@ public class MapView extends Fragment implements OnMapReadyCallback {
 
     }
 
-    public void tagCreated(){
+    public void tagCreated() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy", Locale.ENGLISH);
-        SimpleDateFormat timeFormat = new SimpleDateFormat("h:m:s a z", Locale.ENGLISH);
+        SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm:s a z", Locale.ENGLISH);
         String date = dateFormat.format(new Date());
         String time = timeFormat.format(new Date());
-        created = String.format("%s - %s",date,time);
+        created = String.format("%s - %s", date, time);
         Log.d(TAG, "tagCreated: " + created);
     }
+
 
     public void setUpMap(GoogleMap map) {
         this.googleMap = map;
         googleMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
             @Override
             public void onMapLoaded() {
+                //Animate camera to current location after map loads
                 Log.d(TAG, "onMapLoaded: CALLBACK LOADED");
                 //progressBarStop();
             }
@@ -290,78 +249,41 @@ public class MapView extends Fragment implements OnMapReadyCallback {
             @Override
             public void onMapLongClick(final LatLng latLng) {
                 GenerateKey();
+                tagCreated();
                 //set a marker
                 //AlertDialog
                 lat = latLng.latitude;
                 mLong = latLng.longitude;
-                final AlertDialog.Builder tagBuilder = new AlertDialog.Builder(getActivity());
-                tagBuilder.setTitle("Tag");
-                LayoutInflater inflater = getActivity().getLayoutInflater();
-                View dialogView = inflater.inflate(R.layout.tag_new_dialog, null);
-                tagBuilder.setView(dialogView);
-                final EditText title_et = (EditText)
-                        dialogView.findViewById(R.id.tag_et_title);
-                tagBuilder.setPositiveButton("Save Tag", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if(title_et.getText().toString().isEmpty()){
-                            Toast.makeText(getActivity(), "Tag empty, please add a tag."
-                                    , Toast.LENGTH_SHORT).show();
-                        }else{
-                            tag_title = title_et.getText().toString();
-                            title = tag_title;
-                            permissions = "";
-                            created = "";
-                            tagCreated();
-                            TagObject mTag = new TagObject(title, lat, mLong, mKey,permissions,created);
-                            mDatabase.child("tags").child(mUser.getUid()).child(mKey).setValue(mTag);
-                            Toast.makeText(getActivity(), "Tag Added!"
-                                    , Toast.LENGTH_SHORT).show();
-                            //now add the marker after it is saved.
-                            googleMap.addMarker(new MarkerOptions()
-                                    .position(new LatLng(lat,mLong))
-                                    .title(title));
-                        }
-                    }
-                }).
-                        setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                Toast.makeText(getActivity(), "Cool, maybe later."
-                                        , Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                tagBuilder.create().show();
-                // Once the dialog is dismissed add the marker with the info saved.
-
-
+                Log.i("TagEditScreen", " LOADED");
+                TagEdit tagEdit = new TagEdit();
+                FragmentManager fragmentManager = getFragmentManager();
+                Bundle bundle = new Bundle();
+                //Create title in TagEdit
+                bundle.putString("created", created);
+                bundle.putDouble("lat", lat);
+                bundle.putDouble("long", mLong);
+                //Select permission in Tagedit
+                tagEdit.setArguments(bundle);
+                //Replace intent with Bundle and put it in the transaction
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.main_FrameLayout, tagEdit);
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
             }
         });
 
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        if (requestCode == requestPermissionCode) {
-            if (permissions.length == 1 &&
-                    permissions[0] == Manifest.permission.ACCESS_FINE_LOCATION &&
-                    grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                if (ActivityCompat.checkSelfPermission(getActivity(),
-                        Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
-                    return;
-                }
-                googleMap.setMyLocationEnabled(true);
-            } else {
-                // Permission was denied. Display an error message.
-                permissionDeniedToast();
-            }
-        }
+    public void onStart() {
+        super.onStart();
+        mGoogleApiClient.connect();
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
+    public void onStop() {
+        super.onStop();
+        mGoogleApiClient.disconnect();
     }
 
     @Override
@@ -372,12 +294,36 @@ public class MapView extends Fragment implements OnMapReadyCallback {
     @Override
     public void onResume() {
         super.onResume();
-        googleMap = mapFragment.getMap();
     }
 
     @Override
     public void onPause() {
         super.onPause();
+    }
+
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+            return;
+        }
+        Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                mGoogleApiClient);
+        if (mLastLocation != null) {
+            user_lat = mLastLocation.getLatitude();
+            user_long = mLastLocation.getLongitude();
+        }
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
     }
 }
 

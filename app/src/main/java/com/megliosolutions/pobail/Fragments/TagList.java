@@ -66,10 +66,6 @@ public class TagList extends Fragment {
                 fragmentTransaction.replace(R.id.main_FrameLayout, tagPropertyList);
                 fragmentTransaction.commit();
                 getActivity().setTitle("Tag Properties");
-                AppCompatActivity activity = new AppCompatActivity();
-                if (activity.getSupportActionBar() != null) {
-                    activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-                }
             }
         });
 

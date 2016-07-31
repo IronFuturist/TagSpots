@@ -8,8 +8,7 @@
     android:id="@+id/fragment_view_mapview"
     android:fitsSystemWindows="true"
     tools:context="com.megliosolutions.pobail.Fragments.MapView"
-    android:orientation="vertical"
-    android:background="@color/colorAccent">
+    android:orientation="vertical">
 
     <RelativeLayout
         android:orientation="vertical"

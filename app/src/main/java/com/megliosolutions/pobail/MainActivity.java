@@ -1,9 +1,12 @@
 package com.megliosolutions.pobail;
 
+import android.*;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.os.PersistableBundle;
@@ -19,10 +22,11 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.fastaccess.permission.base.PermissionHelper;
+import com.fastaccess.permission.base.callback.OnPermissionCallback;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -35,17 +39,14 @@ import com.megliosolutions.pobail.Fragments.Settings;
 import com.megliosolutions.pobail.Objects.TagObject;
 import com.megliosolutions.pobail.Objects.UserObject;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
+        OnPermissionCallback{
 
     private static final String SELECTED_ITEM_ID = "selected_item_id";
-    private static final String FIRST_TIME = "first_time";
 
     //TAG STRING
     public static final String TAG = MainActivity.class.getSimpleName();
 
-
-    //Views
-    public ListView main_ListView;
     public TextView nav_Header;
 
     //FragmentManager & Transaction
@@ -58,6 +59,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     //Bundle
     public Bundle bundle;
 
+    public PermissionHelper permissionHelper;
+
     //Firebase
     public FirebaseAuth mAuth;
     public FirebaseUser mUser;
@@ -65,40 +68,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public DatabaseReference mNodeRef;
 
     //Strings
-    public String static_ip;
-    public String desc;
-    public String mKey;
     public String currentUser;
-    public String getUsername;
-    public String setUsername;
-    public String getName;
-    public String setName;
-    public String getMoto;
-    public String setMoto;
-    public String keys;
     public static final String TAG_MAPVIEW_FRAGMENT = "TAG_MAPVIEW_FRAGMENT";
     public static final String TAG_HASHTAG_FRAGMENT = "TAG_HASHTAG_FRAGMENT";
     public static final String TAG_SETTINGS_FRAGMENT = "TAG_SETTINGS_FRAGMENT";
     public static final String TAG_FRIENDS_FRAGMENT = "TAG_FRIENDS_FRAGMENT";
     public static final String TAG_PROFILE_FRAGMENT = "TAG_PROFILE_FRAGMENT";
 
-    //doubles
-    public double lat;
-    public double mLong;
-
-    //ints
-    public int position = 0;
     public int mSelectedID;
-
-    //Adapters
-    public TagListAdapter listAdapter;
 
     //booleans
     public boolean mUserSawDrawer = false;
-
-    //Objects
-    public UserObject userObject;
-    public TagObject tag;
 
     //Nav Drawer stuff
     public DrawerLayout mDrawerLayout;
@@ -108,13 +88,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     //toolbar
     public Toolbar toolbar;
 
+    final String DIALOG_TITLE = "Access Location";
+    final String DIALOG_MESSAGE = "We need to access your Location to use this app.";
+    public final String PERMISSION = android.Manifest.permission.ACCESS_FINE_LOCATION;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
+        //Request Permissions
+        RequestPermisions();
 
         //Instances
         setInstances();
@@ -129,7 +114,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setViews();
 
         //Set FrameLayout
-        SetFrameLayout();
+        SetInitialFrame();
 
         //Generate key for nodes
         //GenerateKey();
@@ -184,14 +169,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         t.start();
     }
 
+    private void RequestPermisions() {
+        permissionHelper = PermissionHelper.getInstance(this);
+        permissionHelper.setForceAccepting(false).request(PERMISSION);
+    }
+
     public void openDrawer(){
         mDrawerLayout.openDrawer(GravityCompat.START);
         Log.d(TAG, "Drawer was OPENED ");
-    }
-
-    public void closeDrawer(){
-        mDrawerLayout.closeDrawer(GravityCompat.START);
-        Log.d(TAG, "Drawer was CLOSED ");
     }
 
     private void navToID(int mSelectedID) {
@@ -201,7 +186,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             MapView fragment = new MapView();
             fragmentManager = getSupportFragmentManager();
             //Replace intent with Bundle and put it in the transaction
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.replace(R.id.main_FrameLayout, fragment);
             fragmentTransaction.commit();
             setTitle("Map");
@@ -212,7 +197,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             HashTag tag = new HashTag();
             fragmentManager = getSupportFragmentManager();
             //Replace intent with Bundle and put it in the transaction
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.replace(R.id.main_FrameLayout, tag);
             fragmentTransaction.commit();
             setTitle("Tags");
@@ -223,7 +208,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             ProfileViewPager profile = new ProfileViewPager();
             fragmentManager = getSupportFragmentManager();
             //Replace intent with Bundle and put it in the transaction
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.replace(R.id.main_FrameLayout, profile);
             fragmentTransaction.commit();
             setTitle("Pobail");
@@ -234,7 +219,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             Settings settings = new Settings();
             fragmentManager = getSupportFragmentManager();
             //Replace intent with Bundle and put it in the transaction
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.replace(R.id.main_FrameLayout, settings);
             fragmentTransaction.commit();
             setTitle("Settings");
@@ -250,11 +235,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         nav_Header = (TextView) findViewById(R.id.nav_header_text);
     }
 
-    private void SetFrameLayout() {
+    private void SetInitialFrame() {
         mapView = new MapView();
         fragmentManager = getSupportFragmentManager();
         //Replace intent with Bundle and put it in the transaction
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.add(R.id.main_FrameLayout, mapView,TAG_MAPVIEW_FRAGMENT);
         fragmentTransaction.commit();
     }
@@ -265,56 +250,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mNodeRef = mDatabase.child("nodes");
         currentUser = mUser.getUid();
-    }
-
-    private void setProfileInfo() {
-        if(getUsername.equalsIgnoreCase("")
-                && getName.equalsIgnoreCase("")
-                && getMoto.equalsIgnoreCase("")) {
-            //AlertDialog
-            final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MainActivity.this);
-            dialogBuilder.setTitle("Profile Info");
-            LayoutInflater inflater = MainActivity.this.getLayoutInflater();
-            View dialogView = inflater.inflate(R.layout.main_add_userinfo, null);
-            dialogBuilder.setView(dialogView);
-            final EditText username_et = (EditText)
-                    dialogView.findViewById(R.id.main_username_et);
-            final EditText name_et = (EditText)
-                    dialogView.findViewById(R.id.main_name_et);
-            final EditText moto_et = (EditText)
-                    dialogView.findViewById(R.id.main_moto_et);
-            dialogBuilder.setPositiveButton("Save Info", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    setUsername = username_et.getText().toString();
-                    setName = name_et.getText().toString();
-                    setMoto = moto_et.getText().toString();
-                    String username = setUsername;
-                    String name = setName;
-                    String moto = setMoto;
-                    mDatabase.child("users").child(mUser.getUid()).child("username").setValue(username);
-                    mDatabase.child("users").child(mUser.getUid()).child("name").setValue(name);
-                    mDatabase.child("users").child(mUser.getUid()).child("moto").setValue(moto);
-                    Toast.makeText(getApplicationContext(), "User info saved!", Toast.LENGTH_SHORT).show();
-                }
-            }).
-                    setNegativeButton("Or Not...", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            Toast.makeText(getApplicationContext(), "Fine, nvm then..."
-                                    , Toast.LENGTH_SHORT).show();
-                        }
-                    });
-
-            dialogBuilder.create().show();
-        }else{
-            //Log
-            Log.d(TAG, "setProfileInfo: " + "Info was previously filled.");
-        }
-        Log.d(TAG, "setProfileInfo Username: " + getUsername);
-        Log.d(TAG, "setProfileInfo Name:     " + getName);
-        Log.d(TAG, "setProfileInfo Moto:     " + getMoto);
-
     }
 
     private void InitializeStuff() {
@@ -328,17 +263,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-
     }
 
     @Override
@@ -375,5 +299,80 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             super.onBackPressed();
         }
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        permissionHelper.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        permissionHelper.onActivityForResult(requestCode);
+    }
+
+    private void showAlertDialog(String title, String message, final String permission) {
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton("Request", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        permissionHelper.requestAfterExplanation(permission);
+                    }
+                })
+                .create();
+
+        dialog.show();
+    }
+
+
+    @Override
+    public void onPermissionGranted(String[] permissionName) {
+        Log.d(TAG, "onPermissionGranted: LOCATION PERMISSION GRANTED");
+
+    }
+
+    @Override
+    public void onPermissionDeclined(String[] permissionName) {
+        Log.d(TAG, "onPermissionGranted: LOCATION PERMISSION DENIED");
+    }
+
+    @Override
+    public void onPermissionPreGranted(String permissionsName) {
+        Log.d(TAG, "onPermissionGranted: LOCATION PERMISSION GRANTED");
+    }
+
+    @Override
+    public void onPermissionNeedExplanation(String permissionName) {
+         /*
+        Show dialog here and ask permission again. Say why
+         */
+
+        showAlertDialog(DIALOG_TITLE, DIALOG_MESSAGE, PERMISSION);
+    }
+
+    @Override
+    public void onPermissionReallyDeclined(String permissionName) {
+        Log.e(TAG, "onPermissionReallyDeclined: PERMISSIONS SEVERLY DECLINED " + permissionName);
+    }
+
+    @Override
+    public void onNoPermissionNeeded() {
+        Log.d(TAG, "onNoPermissionNeeded: NO PERMISSIONS NEEDED");
     }
 }
