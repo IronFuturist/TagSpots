@@ -1,6 +1,4 @@
-package com.megliosolutions.pobail.Objects;
-
-import com.google.android.gms.maps.model.LatLng;
+package com.megliosolutions.tagspots.Objects;
 
 /**
  * Created by Meglio on 6/27/16.

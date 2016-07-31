@@ -1,6 +1,5 @@
-package com.megliosolutions.pobail;
+package com.megliosolutions.tagspots;
 
-import android.*;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -18,12 +17,8 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.fastaccess.permission.base.PermissionHelper;
 import com.fastaccess.permission.base.callback.OnPermissionCallback;
@@ -31,13 +26,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.megliosolutions.pobail.Adapters.TagListAdapter;
-import com.megliosolutions.pobail.Fragments.HashTag;
-import com.megliosolutions.pobail.Fragments.MapView;
-import com.megliosolutions.pobail.Fragments.ProfileViewPager;
-import com.megliosolutions.pobail.Fragments.Settings;
-import com.megliosolutions.pobail.Objects.TagObject;
-import com.megliosolutions.pobail.Objects.UserObject;
+import com.megliosolutions.tagspots.Fragments.HashTag;
+import com.megliosolutions.tagspots.Fragments.MapView;
+import com.megliosolutions.tagspots.Fragments.ProfileViewPager;
+import com.megliosolutions.tagspots.Fragments.Settings;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
         OnPermissionCallback{

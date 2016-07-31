@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:id="@+id/fragment_view_mapview"
     android:fitsSystemWindows="true"
-    tools:context="com.megliosolutions.pobail.Fragments.MapView"
+    tools:context="com.megliosolutions.tagspots.Fragments.MapView"
     android:orientation="vertical">
 
     <RelativeLayout

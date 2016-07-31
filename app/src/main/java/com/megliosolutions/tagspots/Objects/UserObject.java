@@ -1,10 +1,4 @@
-package com.megliosolutions.pobail.Objects;
-
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.FirebaseDatabase;
-
-import java.util.HashMap;
-import java.util.Map;
+package com.megliosolutions.tagspots.Objects;
 
 /**
  * Created by Meglio on 6/13/16.

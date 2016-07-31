@@ -1,4 +1,4 @@
-package com.megliosolutions.pobail.Utils;
+package com.megliosolutions.tagspots.Utils;
 
 /**
  * Created by Meglio on 7/5/16.

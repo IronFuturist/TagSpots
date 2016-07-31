@@ -1,4 +1,4 @@
-package com.megliosolutions.pobail.Fragments;
+package com.megliosolutions.tagspots.Fragments;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -7,7 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.megliosolutions.pobail.R;
+import com.megliosolutions.tagspots.R;
 
 /**
  * Created by Wesley on 7/28/2016.

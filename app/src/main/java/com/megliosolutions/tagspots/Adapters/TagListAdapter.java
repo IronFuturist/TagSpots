@@ -1,4 +1,4 @@
-package com.megliosolutions.pobail.Adapters;
+package com.megliosolutions.tagspots.Adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -7,8 +7,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.megliosolutions.pobail.Objects.TagObject;
-import com.megliosolutions.pobail.R;
+import com.megliosolutions.tagspots.Objects.TagObject;
+import com.megliosolutions.tagspots.R;
 
 import java.util.List;
 

@@ -1,27 +1,24 @@
-package com.megliosolutions.pobail.Fragments;
+package com.megliosolutions.tagspots.Fragments;
 
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.megliosolutions.pobail.R;
+import com.megliosolutions.tagspots.R;
 
 /**
- * Created by Meglio on 7/11/16.
+ * Created by Meglio on 7/12/16.
  */
-public class FriendsActivity extends Fragment {
+public class HashTag extends Fragment {
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_friends, container,false);
+        View view = inflater.inflate(R.layout.fragment_tag,container,false);
         UpdateTitle();
-
 
         return view;
     }
@@ -29,7 +26,7 @@ public class FriendsActivity extends Fragment {
     private void UpdateTitle() {
 
         //Set Title to Description
-        getActivity().setTitle("Friends");
+        getActivity().setTitle("Tags");
 
     }
 }

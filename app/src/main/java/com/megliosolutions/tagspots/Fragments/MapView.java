@@ -1,4 +1,4 @@
-package com.megliosolutions.pobail.Fragments;
+package com.megliosolutions.tagspots.Fragments;
 
 
 import android.Manifest;
@@ -20,12 +20,10 @@ import android.view.ViewGroup;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.auth.FirebaseAuth;
@@ -35,8 +33,8 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.megliosolutions.pobail.Objects.TagObject;
-import com.megliosolutions.pobail.R;
+import com.megliosolutions.tagspots.Objects.TagObject;
+import com.megliosolutions.tagspots.R;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;

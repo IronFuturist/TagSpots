@@ -1,13 +1,8 @@
-package com.megliosolutions.pobail.Fragments;
+package com.megliosolutions.tagspots.Fragments;
 
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.TabLayout;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,8 +17,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.megliosolutions.pobail.Objects.TagObject;
-import com.megliosolutions.pobail.R;
+import com.megliosolutions.tagspots.Objects.TagObject;
+import com.megliosolutions.tagspots.R;
 
 import java.util.ArrayList;
 

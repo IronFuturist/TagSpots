@@ -1,20 +1,29 @@
 {
   "project_info": {
-    "project_number": "155492185923",
-    "firebase_url": "https://pobail-b60c4.firebaseio.com/",
-    "project_id": "pobail-b60c4",
-    "storage_bucket": "pobail-b60c4.appspot.com"
+    "project_number": "471226676504",
+    "firebase_url": "https://tagspots-93f9e.firebaseio.com",
+    "project_id": "tagspots-93f9e",
+    "storage_bucket": "tagspots-93f9e.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:999681956712:android:fecc6fa3452f28ec",
+        "mobilesdk_app_id": "1:471226676504:android:1731d3151660e9b9",
         "android_client_info": {
-          "package_name": "com.megliosolutions.pobail"
+          "package_name": "com.megliosolutions.tagspots"
         }
       },
-      "oauth_client": [],
-      "api_key": [{ "current_key": "AIzaSyCtszmfXSCUXI_sXAXpsFZ7BiVL-C3fzBQ" }],
+      "oauth_client": [
+        {
+          "client_id": "471226676504-upc650ir1v1j0vk2bs8hu70frar8jdll.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA8i0he0GRqf3EwxV3xUhY2LvPCmiiwtn8"
+        }
+      ],
       "services": {
         "analytics_service": {
           "status": 1

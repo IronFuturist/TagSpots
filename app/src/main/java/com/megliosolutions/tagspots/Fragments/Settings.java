@@ -1,8 +1,6 @@
-package com.megliosolutions.pobail.Fragments;
+package com.megliosolutions.tagspots.Fragments;
 
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -13,9 +11,8 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.megliosolutions.pobail.MainActivity;
-import com.megliosolutions.pobail.R;
-import com.megliosolutions.pobail.Utils.Login;
+import com.megliosolutions.tagspots.R;
+import com.megliosolutions.tagspots.Utils.Login;
 
 /**
  * Created by Meglio on 7/11/16.

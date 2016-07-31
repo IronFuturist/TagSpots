@@ -1,9 +1,9 @@
-package com.megliosolutions.pobail.Utils;
+package com.megliosolutions.tagspots.Utils;
 
 import android.app.ProgressDialog;
 import android.support.v7.app.AppCompatActivity;
 
-import com.megliosolutions.pobail.R;
+import com.megliosolutions.tagspots.R;
 
 /**
  * Created by Meglio on 6/12/16.

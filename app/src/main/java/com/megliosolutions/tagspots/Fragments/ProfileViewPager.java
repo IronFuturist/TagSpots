@@ -1,4 +1,4 @@
-package com.megliosolutions.pobail.Fragments;
+package com.megliosolutions.tagspots.Fragments;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -14,7 +14,7 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.megliosolutions.pobail.R;
+import com.megliosolutions.tagspots.R;
 
 /**
  * Created by Meglio on 7/22/16.
