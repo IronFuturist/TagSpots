@@ -295,6 +295,7 @@ public class MapView extends Fragment implements OnMapReadyCallback, GoogleApiCl
     public void onResume() {
         super.onResume();
         mGoogleApiClient.connect();
+        //What to do onResume?!?!?
     }
 
     @Override
