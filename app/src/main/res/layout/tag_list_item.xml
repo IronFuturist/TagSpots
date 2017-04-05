@@ -22,37 +22,29 @@
             android:padding="15dp">
 
             <LinearLayout
-                android:layout_width="98dp"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
                 android:layout_weight=".20">
 
                 <TextView
-                    android:layout_width="127dp"
-                    android:layout_height="wrap_content"
-                    android:text="TAG TITLE"
                     android:id="@+id/tag_item_title"
-                    android:textSize="@dimen/tag_item_title_text_size"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="10dp"
+                    android:text="TAG TITLE"
                     android:textColor="@color/textColor"
-                    android:layout_marginRight="10dp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:layout_weight=".80">
+                    android:textSize="@dimen/tag_item_title_text_size" />
 
                 <TextView
+                    android:id="@+id/tag_item_created"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:text="CREATED"
-                    android:id="@+id/tag_item_created"
-                    android:textSize="12sp"
-                    android:textColor="@color/textColor"
                     android:gravity="center_vertical"
-                    android:paddingLeft="5dp" />
-
+                    android:paddingLeft="5dp"
+                    android:text="CREATED"
+                    android:textColor="@color/textColor"
+                    android:textSize="12sp" />
             </LinearLayout>
 
 

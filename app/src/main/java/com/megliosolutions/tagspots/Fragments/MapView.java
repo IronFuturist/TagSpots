@@ -2,9 +2,11 @@ package com.megliosolutions.tagspots.Fragments;
 
 
 import android.Manifest;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -24,6 +26,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.auth.FirebaseAuth;
@@ -44,7 +47,7 @@ import java.util.Locale;
 public class MapView extends Fragment implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     public static final String TAG = MapView.class.getSimpleName();
-
+    public static final int ACCESS_REQUEST = 123;
 
     public double user_lat;
     public double user_long;
@@ -63,7 +66,9 @@ public class MapView extends Fragment implements OnMapReadyCallback, GoogleApiCl
     public FirebaseAuth mAuth;
     public FirebaseUser mUser;
 
-    public ArrayList<TagObject> tagObjectArrayList = new ArrayList<>();
+    public ArrayList<TagObject> userTagsArray = new ArrayList<>();
+    public ArrayList<TagObject> publicTagArray = new ArrayList<>();
+    public ArrayList<TagObject> friendTagsArray = new ArrayList<>();
     public TagObject tag;
 
     public SupportMapFragment mapFragment;
@@ -77,6 +82,15 @@ public class MapView extends Fragment implements OnMapReadyCallback, GoogleApiCl
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        int permission = ContextCompat.checkSelfPermission(getContext(),
+                Manifest.permission_group.LOCATION);
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            Log.i(TAG, "Permission to write to external storage is denied");
+            MakePermissionsRequest();
+        }
+        else{
+            Log.i(TAG,"Permission Granted!!!!");
+        }
         if (mGoogleApiClient == null) {
             mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
                     .addConnectionCallbacks(this)
@@ -97,8 +111,19 @@ public class MapView extends Fragment implements OnMapReadyCallback, GoogleApiCl
         //Set Instances
         setInstances();
 
-        pullTags();
+        pullCurrentUserTags();
         //SetMap
+        setMap();
+        return view;
+    }
+
+    protected void MakePermissionsRequest() {
+        ActivityCompat.requestPermissions(getActivity(),
+                new String[]{Manifest.permission_group.LOCATION},
+                ACCESS_REQUEST);
+    }
+
+    private void setMap() {
         try {
             if (mapFragment == null) {
                 mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.node_maps);
@@ -108,39 +133,41 @@ public class MapView extends Fragment implements OnMapReadyCallback, GoogleApiCl
             e.printStackTrace();
             Log.d(TAG, "onCreateView: CATCH EXCEPTION");
         }
-        return view;
     }
 
+    private void pullPublicTags(){
+       // mTag.
+    }
 
-    private void pullTags() {
+    private void pullCurrentUserTags() {
         ChildEventListener childEventListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 TagObject mTag = dataSnapshot.getValue(TagObject.class);
 
-                tagObjectArrayList.add(mTag);
-                Log.d(TAG, "onChildAdded: " + tagObjectArrayList.size());
+                userTagsArray.add(mTag);
+                Log.d(TAG, "onChildAdded: " + userTagsArray.size());
             }
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                 tag = dataSnapshot.getValue(TagObject.class);
 
-                tagObjectArrayList.add(tag);
+                userTagsArray.add(tag);
             }
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
                 /*tag = dataSnapshot.getValue(TagObject.class);
 
-                tagObjectArrayList.remove(tag);*/
+                userTagsArray.remove(tag);*/
             }
 
             @Override
             public void onChildMoved(DataSnapshot dataSnapshot, String s) {
                 tag = dataSnapshot.getValue(TagObject.class);
 
-                tagObjectArrayList.add(tag);
+                userTagsArray.add(tag);
             }
 
             @Override
@@ -151,13 +178,91 @@ public class MapView extends Fragment implements OnMapReadyCallback, GoogleApiCl
         mTag.child(mUser.getUid()).addChildEventListener(childEventListener);
     }
 
+    private void pullPrivateTags() {
+        ChildEventListener childEventListener = new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                TagObject mTag = dataSnapshot.getValue(TagObject.class);
+
+                userTagsArray.add(mTag);
+                Log.d(TAG, "onChildAdded: " + userTagsArray.size());
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                tag = dataSnapshot.getValue(TagObject.class);
+
+                userTagsArray.add(tag);
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                /*tag = dataSnapshot.getValue(TagObject.class);
+
+                userTagsArray.remove(tag);*/
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                tag = dataSnapshot.getValue(TagObject.class);
+
+                userTagsArray.add(tag);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.d(TAG, "onCancelled: ");
+            }
+        };
+        mTag.child(mUser.getUid()).addChildEventListener(childEventListener);
+    }
+
+
+    private void pullFriendTags() {
+        ChildEventListener childEventListener = new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                TagObject mTag = dataSnapshot.getValue(TagObject.class);
+
+                userTagsArray.add(mTag);
+                Log.d(TAG, "onChildAdded: " + userTagsArray.size());
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                tag = dataSnapshot.getValue(TagObject.class);
+
+                userTagsArray.add(tag);
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                /*tag = dataSnapshot.getValue(TagObject.class);
+
+                userTagsArray.remove(tag);*/
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                tag = dataSnapshot.getValue(TagObject.class);
+
+                userTagsArray.add(tag);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.d(TAG, "onCancelled: ");
+            }
+        };
+        mTag.child(mUser.getUid()).addChildEventListener(childEventListener);
+    }
+
+
     private void setInstances() {
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mTag = mDatabase.child(childTag);
-        //mTagProperty = mDatabase.child(childTag).child(selectedKey).child(childTagProperty);
-        Log.i(TAG, "SetInstances-SelectedKey: " + selectedKey);
         currentUser = mUser.getUid();
     }
 
@@ -178,47 +283,56 @@ public class MapView extends Fragment implements OnMapReadyCallback, GoogleApiCl
 
     @Override
     public void onMapReady(GoogleMap map) {
-        tagObjectArrayList.size();
         googleMap = map;
         setUpMap(googleMap);
         googleMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
         if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
+
             googleMap.setMyLocationEnabled(true);
+            googleMap.getUiSettings().setCompassEnabled(true);
             googleMap.getUiSettings().setMapToolbarEnabled(true);
             googleMap.getUiSettings().setZoomControlsEnabled(true);
-        } else {
-            googleMap.setMyLocationEnabled(false);
-            googleMap.getUiSettings().setMapToolbarEnabled(false);
-            googleMap.getUiSettings().setZoomControlsEnabled(false);
         }
-        // Add ten cluster items in close proximity, for purposes of this example.
-        Log.d(TAG, "onMapReady: " + tagObjectArrayList.size());
-        /*
-        */
-        googleMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
-            @Override
-            public void onMapLoaded() {
-                for (int i = 0; i < tagObjectArrayList.size(); i++) {
-                    double lat = tagObjectArrayList.get(i).getLat();
-                    double lng = tagObjectArrayList.get(i).getLng();
-                    String title = tagObjectArrayList.get(i).getTag_title();
+        //ON map loaded load the tags on the map for the current user.
+        //Then move the camera to the user's location
+        for (int i = 0; i < userTagsArray.size(); i++) {
+            String permission = userTagsArray.get(i).getPermission();
+            if(permission.equalsIgnoreCase("public")){
 
-                    markerOptions = new MarkerOptions()
-                            .position(new LatLng(lat, lng))
-                            .title(title);
-
-                    googleMap.addMarker(markerOptions);
-
-                    LatLng me = new LatLng(user_lat,user_long);
-
-                    googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(me,18));
-
-                    mGoogleApiClient.disconnect();
-
-                }
             }
-        });
+            else if(permission.equalsIgnoreCase("private")){
+
+            }
+            else if(permission.equalsIgnoreCase("friends")){
+
+            }
+            double lat = userTagsArray.get(i).getLat();
+            double lng = userTagsArray.get(i).getLng();
+            String title = userTagsArray.get(i).getTag_title();
+
+            markerOptions = new MarkerOptions()
+                    .position(new LatLng(lat, lng))
+                    .title(title);
+
+            googleMap.addMarker(markerOptions);
+
+            LatLng me = new LatLng(user_lat,user_long);
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(me,19));
+            CameraPosition cameraPosition = CameraPosition.builder()
+                    .target(me)
+                    .zoom(19)
+                    .bearing(90)
+                    .build();
+
+
+
+                    /*googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition),
+                            1000,null);*/
+
+            mGoogleApiClient.disconnect();
+
+        }
         Log.d(TAG, "populateMarkers: ADDED MARKERS");
 
     }
@@ -235,14 +349,7 @@ public class MapView extends Fragment implements OnMapReadyCallback, GoogleApiCl
 
     public void setUpMap(GoogleMap map) {
         this.googleMap = map;
-        googleMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
-            @Override
-            public void onMapLoaded() {
-                //Animate camera to current location after map loads
-                Log.d(TAG, "onMapLoaded: CALLBACK LOADED");
-                //progressBarStop();
-            }
-        });
+
         googleMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
             public void onMapLongClick(final LatLng latLng) {
@@ -301,6 +408,7 @@ public class MapView extends Fragment implements OnMapReadyCallback, GoogleApiCl
     @Override
     public void onPause() {
         super.onPause();
+
         mGoogleApiClient.disconnect();
     }
 
@@ -328,5 +436,29 @@ public class MapView extends Fragment implements OnMapReadyCallback, GoogleApiCl
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
     }
+/*
+    @Override
+    public void onMapLoaded() {
+        //Animate camera to current location after map loads
+        // Get the shared preferences
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+
+// Get the zoom level (change the 13f to the default zoom level that you want)
+        float zoom = sharedPreferences.getFloat("Zoom_value", 13f);
+
+        LatLng me = new LatLng(user_lat,user_long);
+
+
+        CameraPosition cameraPosition = new CameraPosition.Builder()
+                .target(googleMap.getCameraPosition().target)
+                .zoom(zoom)
+                .build();
+
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(me, 19));
+
+        *//*googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+        Log.d(TAG, "onMapLoaded: CALLBACK LOADED");*//*
+        //progressBarStop();
+    }*/
 }
 

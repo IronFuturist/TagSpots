@@ -26,7 +26,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.megliosolutions.tagspots.Fragments.HashTag;
 import com.megliosolutions.tagspots.Fragments.MapView;
 import com.megliosolutions.tagspots.Fragments.ProfileViewPager;
 import com.megliosolutions.tagspots.Fragments.Settings;
@@ -76,6 +75,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public DrawerLayout mDrawerLayout;
     public NavigationView mNavView;
     public ActionBarDrawerToggle drawerToggle;
+    public TextView username_TV;
 
     //toolbar
     public Toolbar toolbar;
@@ -120,6 +120,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             mNavView.setNavigationItemSelectedListener(this);
         }
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        username_TV = (TextView) findViewById(R.id.nav_header_text);
         drawerToggle = new ActionBarDrawerToggle(
                 this,
                 mDrawerLayout,
@@ -182,17 +183,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             fragmentTransaction.replace(R.id.main_FrameLayout, fragment);
             fragmentTransaction.commit();
             setTitle("Map");
-        }
-        if(mSelectedID == R.id.nav_id_tag){
-            mDrawerLayout.closeDrawer(GravityCompat.START);
-            Log.i("TAG", " LOADED");
-            HashTag tag = new HashTag();
-            fragmentManager = getSupportFragmentManager();
-            //Replace intent with Bundle and put it in the transaction
-            fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.replace(R.id.main_FrameLayout, tag);
-            fragmentTransaction.commit();
-            setTitle("Tags");
         }
         if(mSelectedID == R.id.nav_id_profile){
             mDrawerLayout.closeDrawer(GravityCompat.START);

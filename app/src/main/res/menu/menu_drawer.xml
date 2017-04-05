@@ -8,10 +8,6 @@
             android:id="@+id/nav_id_map"
             android:icon="@drawable/ic_map_black_48dp"
             android:title="@string/nav_map"/>
-        <item
-            android:id="@+id/nav_id_tag"
-            android:icon="@drawable/pound_box"
-            android:title="@string/nav_str_tag"/>
     </group>
     <group
         android:checkableBehavior="single"

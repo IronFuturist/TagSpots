@@ -54,7 +54,7 @@ public class TagList extends Fragment {
         tag_listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //TagObject tag = tagObjectArrayList.get(position);
+                //TagObject tag = userTagsArray.get(position);
                 //Go to fragment
                 TagPropertyList tagPropertyList = new TagPropertyList();
                 FragmentManager fragmentManager = getFragmentManager();
