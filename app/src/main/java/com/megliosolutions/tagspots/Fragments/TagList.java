@@ -32,6 +32,7 @@ import java.util.ArrayList;
 public class TagList extends Fragment {
 
     public static final String TAG = TagList.class.getSimpleName();
+    public static final String TAG_TAGPROPERTYLIST_ITEM = "TAG_PROPERTYLISTITEM";
     public ListView tag_listView;
     public TagListAdapter listAdapter;
     public ArrayList<TagObject> tagObjectArrayList = new ArrayList<>();
@@ -60,7 +61,7 @@ public class TagList extends Fragment {
                 FragmentManager fragmentManager = getFragmentManager();
                 //Replace intent with Bundle and put it in the transaction
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.main_FrameLayout, tagPropertyList);
+                fragmentTransaction.add(R.id.main_FrameLayout,tagPropertyList,TAG_TAGPROPERTYLIST_ITEM);
                 fragmentTransaction.commit();
                 getActivity().setTitle("Tag Properties");
             }

@@ -27,6 +27,10 @@ public class TagPropertyList extends Fragment {
     public String key;
     public String value;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
 
     @Nullable
     @Override

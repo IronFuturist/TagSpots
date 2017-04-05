@@ -296,43 +296,48 @@ public class MapView extends Fragment implements OnMapReadyCallback, GoogleApiCl
         }
         //ON map loaded load the tags on the map for the current user.
         //Then move the camera to the user's location
-        for (int i = 0; i < userTagsArray.size(); i++) {
-            String permission = userTagsArray.get(i).getPermission();
-            if(permission.equalsIgnoreCase("public")){
+        googleMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
+            @Override
+            public void onMapLoaded() {
+                for (int i = 0; i < userTagsArray.size(); i++) {
+                    String permission = userTagsArray.get(i).getPermission();
+                    if(permission.equalsIgnoreCase("public")){
 
-            }
-            else if(permission.equalsIgnoreCase("private")){
+                    }
+                    else if(permission.equalsIgnoreCase("private")){
 
-            }
-            else if(permission.equalsIgnoreCase("friends")){
+                    }
+                    else if(permission.equalsIgnoreCase("friends")){
 
-            }
-            double lat = userTagsArray.get(i).getLat();
-            double lng = userTagsArray.get(i).getLng();
-            String title = userTagsArray.get(i).getTag_title();
+                    }
+                    double lat = userTagsArray.get(i).getLat();
+                    double lng = userTagsArray.get(i).getLng();
+                    String title = userTagsArray.get(i).getTag_title();
 
-            markerOptions = new MarkerOptions()
-                    .position(new LatLng(lat, lng))
-                    .title(title);
+                    markerOptions = new MarkerOptions()
+                            .position(new LatLng(lat, lng))
+                            .title(title);
 
-            googleMap.addMarker(markerOptions);
+                    googleMap.addMarker(markerOptions);
 
-            LatLng me = new LatLng(user_lat,user_long);
-            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(me,19));
-            CameraPosition cameraPosition = CameraPosition.builder()
-                    .target(me)
-                    .zoom(19)
-                    .bearing(90)
-                    .build();
+                    LatLng me = new LatLng(user_lat,user_long);
 
+                    CameraPosition cameraPosition = CameraPosition.builder()
+                            .target(me)
+                            .zoom(19)
+                            .bearing(90)
+                            .build();
 
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(me,19));
 
                     /*googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition),
                             1000,null);*/
 
-            mGoogleApiClient.disconnect();
+                    mGoogleApiClient.disconnect();
 
-        }
+                }
+            }
+        });
         Log.d(TAG, "populateMarkers: ADDED MARKERS");
 
     }
